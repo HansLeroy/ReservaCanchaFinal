@@ -1,0 +1,65 @@
+services:
+  # Base de datos PostgreSQL
+  - type: pserv
+    name: reservacancha-db
+    env: docker
+    plan: free
+    databases:
+      - name: reservacancha
+        databaseName: reservacancha
+        user: reservacancha
+
+  # Backend Spring Boot
+  - type: web
+    name: reservacancha-backend
+    env: java
+    plan: free
+    buildCommand: cd backend && ./mvnw clean package -DskipTests
+    startCommand: java -jar backend/target/reservacancha-backend-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
+    healthCheckPath: /api/canchas
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DATABASE_URL
+        fromDatabase:
+          name: reservacancha-db
+          property: connectionString
+      - key: DB_HOST
+        fromDatabase:
+          name: reservacancha-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: reservacancha-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: reservacancha-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: reservacancha-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: reservacancha-db
+          property: password
+      - key: DB_DRIVER
+        value: org.postgresql.Driver
+      - key: DB_DIALECT
+        value: org.hibernate.dialect.PostgreSQLDialect
+      - key: FRONTEND_URL
+        value: https://reservacancha-frontend.onrender.com
+
+  # Frontend Angular
+  - type: web
+    name: reservacancha-frontend
+    env: static
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build -- --configuration production
+    staticPublishPath: frontend/dist/reservacancha-frontend
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
