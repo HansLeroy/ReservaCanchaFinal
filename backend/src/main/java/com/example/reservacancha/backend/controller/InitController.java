@@ -48,11 +48,12 @@ public class InitController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            // Verificar si ya existe el usuario admin por email
-            if (usuarioRepository.existsByEmail("admin@reservacancha.com")) {
-                response.put("success", false);
-                response.put("message", "Ya existe un usuario administrador en el sistema");
-                response.put("info", "Usa: admin@reservacancha.com / admin123");
+            // Verificar si ya existe el usuario admin por email o RUT
+            if (usuarioRepository.existsByEmail("admin@reservacancha.com") ||
+                usuarioRepository.existsByRut("11111111-1")) {
+                response.put("success", true);
+                response.put("message", "El usuario administrador ya existe en el sistema");
+                response.put("info", "Puedes iniciar sesión con estas credenciales");
                 response.put("credenciales", Map.of(
                     "email", "admin@reservacancha.com",
                     "password", "admin123",
@@ -87,11 +88,23 @@ public class InitController {
 
             return ResponseEntity.ok(response);
 
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            // Error de duplicate key - el admin ya existe
+            response.put("success", true);
+            response.put("message", "El usuario administrador ya existe (duplicate key detectado)");
+            response.put("info", "Puedes iniciar sesión con estas credenciales");
+            response.put("credenciales", Map.of(
+                "email", "admin@reservacancha.com",
+                "password", "admin123",
+                "rol", "ADMIN"
+            ));
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             response.put("success", false);
-            response.put("message", "Error al crear el usuario administrador");
+            response.put("message", "Error inesperado al crear el usuario administrador");
             response.put("error", e.getMessage());
-            response.put("stackTrace", e.getClass().getName());
+            response.put("errorType", e.getClass().getName());
+            response.put("solucion", "El admin probablemente ya existe. Intenta iniciar sesión con: admin@reservacancha.com / admin123");
             return ResponseEntity.status(500).body(response);
         }
     }
