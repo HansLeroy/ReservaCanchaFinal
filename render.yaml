@@ -26,7 +26,7 @@ services:
     name: reservacancha-frontend
     env: static
     plan: free
-    buildCommand: cd frontend && npm install && npm run build -- --configuration production
+    buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist/reservacancha-frontend
     routes:
       - type: rewrite
