@@ -110,6 +110,54 @@ public class InitController {
     }
 
     /**
+     * Endpoint de emergencia para resetear el password del admin existente
+     * Uso: GET/POST https://reservacancha-backend.onrender.com/api/init/reset-admin
+     */
+    @RequestMapping(value = "/reset-admin", method = {RequestMethod.GET, RequestMethod.POST})
+    public ResponseEntity<Map<String, Object>> resetearPasswordAdmin() {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            // Buscar el usuario admin por email
+            var adminOpt = usuarioRepository.findByEmail("admin@reservacancha.com");
+
+            if (adminOpt.isEmpty()) {
+                // Buscar por RUT alternativo
+                adminOpt = usuarioRepository.findByRut("11111111-1");
+            }
+
+            if (adminOpt.isPresent()) {
+                Usuario admin = adminOpt.get();
+                admin.setPassword("admin123");
+                admin.setActivo(true);
+                admin.setRol("ADMIN");
+                usuarioRepository.save(admin);
+
+                response.put("success", true);
+                response.put("message", "Password del administrador reseteado exitosamente");
+                response.put("credenciales", Map.of(
+                    "email", admin.getEmail(),
+                    "password", "admin123",
+                    "rol", "ADMIN"
+                ));
+                response.put("info", "Ahora puedes iniciar sesión con estas credenciales");
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("success", false);
+                response.put("message", "No se encontró ningún usuario administrador");
+                response.put("solucion", "Visita /api/init/admin para crear uno nuevo");
+                return ResponseEntity.status(404).body(response);
+            }
+
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Error al resetear el password del administrador");
+            response.put("error", e.getMessage());
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
+    /**
      * Endpoint para verificar el estado del sistema
      */
     @GetMapping("/status")
