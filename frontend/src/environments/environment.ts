@@ -1,5 +1,6 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:8080/api'
+  // Temporalmente apuntando a producción para debugging
+  apiUrl: 'https://reservacancha-backend.onrender.com/api'
 };
 
