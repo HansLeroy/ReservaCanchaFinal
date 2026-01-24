@@ -2,11 +2,10 @@ services:
   # Backend Spring Boot
   - type: web
     name: reservacancha-backend
-    env: java
+    runtime: java
     plan: free
-    buildCommand: cd backend && chmod +x mvnw && ./mvnw clean package -DskipTests
-    startCommand: java -jar backend/target/reservacancha-backend-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
-    healthCheckPath: /api/canchas
+    buildCommand: cd backend && ./mvnw clean package -DskipTests
+    startCommand: cd backend && java -jar target/reservacancha-backend-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
