@@ -26,11 +26,4 @@ ENV SPRING_PROFILES_ACTIVE=prod
 
 # Comando de inicio
 ENTRYPOINT ["java", "-jar", "app.jar"]
-EXPOSE 8080
-
-# Variables de entorno por defecto
-ENV SPRING_PROFILES_ACTIVE=prod
-
-# Comando para ejecutar la aplicación
-ENTRYPOINT ["java", "-jar", "app.jar"]
 
