@@ -49,13 +49,16 @@ public class InitController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            // Verificar si ya existe un usuario administrador
-            long countAdmins = usuarioRepository.countByRol("ADMIN");
-
-            if (countAdmins > 0) {
+            // Verificar si ya existe el usuario admin por email
+            if (usuarioRepository.existsByEmail("admin@reservacancha.com")) {
                 response.put("success", false);
                 response.put("message", "Ya existe un usuario administrador en el sistema");
-                response.put("info", "No se puede crear otro admin por seguridad");
+                response.put("info", "Usa: admin@reservacancha.com / admin123");
+                response.put("credenciales", Map.of(
+                    "email", "admin@reservacancha.com",
+                    "password", "admin123",
+                    "rol", "ADMIN"
+                ));
                 return ResponseEntity.ok(response);
             }
 
@@ -89,6 +92,7 @@ public class InitController {
             response.put("success", false);
             response.put("message", "Error al crear el usuario administrador");
             response.put("error", e.getMessage());
+            response.put("stackTrace", e.getClass().getName());
             return ResponseEntity.status(500).body(response);
         }
     }
@@ -102,14 +106,13 @@ public class InitController {
 
         try {
             long totalUsuarios = usuarioRepository.count();
-            long adminCount = usuarioRepository.countByRol("ADMIN");
+            boolean adminExiste = usuarioRepository.existsByEmail("admin@reservacancha.com");
 
             response.put("success", true);
             response.put("totalUsuarios", totalUsuarios);
-            response.put("adminCount", adminCount);
-            response.put("adminExiste", adminCount > 0);
-            response.put("mensaje", adminCount > 0
-                ? "Sistema listo para usar"
+            response.put("adminExiste", adminExiste);
+            response.put("mensaje", adminExiste
+                ? "Sistema listo para usar - admin@reservacancha.com / admin123"
                 : "Sistema necesita inicialización - visita /api/init/admin");
 
             return ResponseEntity.ok(response);
