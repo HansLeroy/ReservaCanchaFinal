@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface ClienteData {
   rut: string;
@@ -14,7 +15,7 @@ export interface ClienteData {
   providedIn: 'root'
 })
 export class ClienteService {
-  private apiUrl = 'http://localhost:8080/api/reservas';
+  private apiUrl = `${environment.apiUrl}/reservas`;
 
   constructor(private http: HttpClient) { }
 

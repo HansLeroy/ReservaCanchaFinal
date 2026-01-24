@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Cancha } from '../models/models';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CanchaService {
-  private apiUrl = 'http://localhost:8080/api/canchas';
+  private apiUrl = `${environment.apiUrl}/canchas`;
 
   constructor(private http: HttpClient) { }
 
