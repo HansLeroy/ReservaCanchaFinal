@@ -5,6 +5,7 @@ import com.example.reservacancha.backend.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,12 +23,28 @@ public class InitController {
     private UsuarioRepository usuarioRepository;
 
     /**
+     * Endpoint raíz - muestra información de ayuda
+     */
+    @RequestMapping(value = {"", "/"}, method = {RequestMethod.GET, RequestMethod.POST})
+    public ResponseEntity<Map<String, Object>> infoEndpoint() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("mensaje", "Endpoint de inicialización del sistema");
+        response.put("endpoints", Map.of(
+            "/api/init/admin", "Crear usuario administrador (GET o POST)",
+            "/api/init/status", "Verificar estado del sistema (GET)"
+        ));
+        response.put("instrucciones", "Visita /api/init/admin para crear el usuario administrador");
+        return ResponseEntity.ok(response);
+    }
+
+    /**
      * Endpoint para crear el usuario administrador inicial
      * Solo funciona una vez - si ya existe un admin, no hace nada
      *
-     * Uso: GET https://reservacancha-backend.onrender.com/api/init/admin
+     * Uso: GET o POST https://reservacancha-backend.onrender.com/api/init/admin
      */
-    @GetMapping("/admin")
+    @RequestMapping(value = "/admin", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<Map<String, Object>> crearAdminInicial() {
         Map<String, Object> response = new HashMap<>();
 
