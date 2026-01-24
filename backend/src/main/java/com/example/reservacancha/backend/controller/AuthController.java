@@ -48,6 +48,17 @@ public class AuthController {
 
             Usuario usuario = usuarioOpt.get();
 
+            // DEBUG: Log para diagnosticar el problema del password
+            System.out.println("=== DEBUG LOGIN ===");
+            System.out.println("Email recibido: " + request.getEmail());
+            System.out.println("Password recibido: [" + request.getPassword() + "]");
+            System.out.println("Password en BD: [" + usuario.getPassword() + "]");
+            System.out.println("Password recibido length: " + request.getPassword().length());
+            System.out.println("Password en BD length: " + usuario.getPassword().length());
+            System.out.println("¿Son iguales? " + usuario.getPassword().equals(request.getPassword()));
+            System.out.println("¿Son iguales (trim)? " + usuario.getPassword().trim().equals(request.getPassword().trim()));
+            System.out.println("==================");
+
             // Verificar si está activo
             if (!usuario.getActivo()) {
                 response.put("success", false);
@@ -55,10 +66,14 @@ public class AuthController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
 
-            // Verificar contraseña
-            if (!usuario.getPassword().equals(request.getPassword())) {
+            // Verificar contraseña - comparar con trim para evitar problemas de espacios
+            String passwordBD = usuario.getPassword() != null ? usuario.getPassword().trim() : "";
+            String passwordRecibido = request.getPassword() != null ? request.getPassword().trim() : "";
+
+            if (!passwordBD.equals(passwordRecibido)) {
                 response.put("success", false);
                 response.put("message", "Contraseña incorrecta");
+                response.put("debug", "Password en BD tiene " + passwordBD.length() + " caracteres, recibido tiene " + passwordRecibido.length());
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
 
