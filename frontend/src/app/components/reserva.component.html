@@ -1,0 +1,535 @@
+<div class="reserva-container">
+  <!-- Fondo deportivo -->
+  <div class="background-pattern"></div>
+
+  <!-- Botón Volver -->
+  <button class="btn-volver" (click)="volverInicio.emit()" title="Volver al Inicio">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Volver al Inicio
+  </button>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-container">
+      <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+        <path d="M12 2v20M2 12h20" stroke="currentColor" stroke-width="2"/>
+      </svg>
+      <h1>Nueva Reserva</h1>
+    </div>
+    <p class="subtitle">Primero ingresa tu RUT para identificarte o registrarte</p>
+  </div>
+
+
+  <!-- Formulario de Reserva -->
+  <div class="reserva-card" *ngIf="mostrarFormulario">
+    <form class="reserva-form" (ngSubmit)="onSubmit()">
+
+      <!-- Sección: Identificación del Cliente -->
+      <div class="form-section section-destacada">
+        <h2 class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="2"/>
+            <path d="M3 10h18" stroke="currentColor" stroke-width="2"/>
+            <circle cx="9" cy="14" r="2" stroke="currentColor" stroke-width="2"/>
+            <path d="M14 13h4M14 16h3" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          Paso 1: Ingresa tu RUT
+        </h2>
+
+        <div class="rut-destacado">
+          <label for="rut" class="form-label-big">RUT del Cliente</label>
+          <input
+            type="text"
+            id="rut"
+            name="rut"
+            [(ngModel)]="rutCliente"
+            (ngModelChange)="onRutChange()"
+            class="form-input form-input-big"
+            [class.input-loading]="buscandoCliente"
+            [class.input-success]="clienteEncontrado"
+            placeholder="Ej: 12345678-9"
+            required
+            autofocus
+          >
+          <small class="form-help">Ingresa tu RUT para buscar tus datos o registrarte como nuevo cliente</small>
+
+          <!-- Mensaje de búsqueda -->
+          <div class="busqueda-message" *ngIf="mensajeBusqueda">
+            <span class="spinner-small" *ngIf="buscandoCliente"></span>
+            <span [class.text-success]="clienteEncontrado" [class.text-info]="!clienteEncontrado && !buscandoCliente">
+              {{ mensajeBusqueda }}
+            </span>
+          </div>
+
+          <!-- 🔴 BOTÓN: ¿Quieres jugar AHORA? -->
+          <div class="disponibilidad-btn-container" *ngIf="rutCliente.length >= 9">
+            <button
+              class="btn-disponibilidad-compacto"
+              (click)="verDisponibilidadInmediata()"
+              type="button">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <span class="btn-texto-compacto">
+                <strong>⚡ ¿Quieres jugar AHORA?</strong>
+                <small>Ver canchas disponibles en este momento</small>
+              </span>
+              <svg class="btn-flecha" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Panel de Disponibilidad Inmediata -->
+          <div class="panel-disponibilidad-inline" *ngIf="mostrarDisponibilidadInmediata && rutCliente.length >= 9">
+            <div class="panel-header">
+              <div class="panel-titulo">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                  <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <div>
+                  <h3>⚡ Disponibilidad Inmediata</h3>
+                  <p class="hora-actual">Hora actual: <strong>{{ horaActual }}</strong></p>
+                </div>
+              </div>
+              <button
+                class="btn-refrescar"
+                (click)="verificarDisponibilidadAhora()"
+                [disabled]="cargandoDisponibilidad"
+                type="button">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M1 4v6h6M23 20v-6h-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Actualizar
+              </button>
+            </div>
+
+            <div class="spinner-center" *ngIf="cargandoDisponibilidad">
+              <div class="spinner-grande"></div>
+              <p>Verificando disponibilidad...</p>
+            </div>
+
+            <!-- Mensaje cuando no hay canchas en el sistema -->
+            <div class="mensaje-sin-canchas" *ngIf="!cargandoDisponibilidad && canchas.length === 0">
+              <div class="mensaje-sin-canchas-content">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                  <path d="M12 8v4M12 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <h4>No hay canchas registradas en el sistema</h4>
+                <p>Por favor, contacta al administrador para registrar canchas.</p>
+              </div>
+            </div>
+
+            <!-- Grid de canchas disponibles -->
+            <div class="canchas-disponibles-grid" *ngIf="!cargandoDisponibilidad && canchas.length > 0">
+              <div
+                *ngFor="let cancha of canchasDisponiblesAhora"
+                class="cancha-disponible-card"
+                [class.cancha-libre]="cancha.disponibleAhora"
+                [class.cancha-ocupada]="!cancha.disponibleAhora">
+
+                <div class="cancha-status">
+                  <span class="status-badge" [class.badge-libre]="cancha.disponibleAhora" [class.badge-ocupada]="!cancha.disponibleAhora">
+                    {{ cancha.disponibleAhora ? '✅ DISPONIBLE' : '🔴 OCUPADA' }}
+                  </span>
+                </div>
+
+                <div class="cancha-info-principal">
+                  <h4>🏟️ {{ cancha.nombre }}</h4>
+                  <p class="cancha-tipo">{{ cancha.tipo }}</p>
+                  <p class="cancha-precio">💰 ${{ cancha.precioPorHora?.toLocaleString('es-CL') }}/hora</p>
+                </div>
+
+                <div class="cancha-disponibilidad-info">
+                  <div *ngIf="cancha.disponibleAhora" class="info-libre">
+                    <p class="texto-destacado">✅ Disponible para reservar ahora</p>
+                    <p class="texto-secundario" *ngIf="cancha.proximaReserva">
+                      Libre hasta {{ cancha.proximaReserva.horaInicio }}
+                    </p>
+                    <p class="texto-secundario" *ngIf="!cancha.proximaReserva">
+                      Sin reservas pendientes hoy
+                    </p>
+                  </div>
+
+                  <div *ngIf="!cancha.disponibleAhora" class="info-ocupada">
+                    <p class="texto-destacado">🔴 Ocupada hasta {{ cancha.ocupadaHasta }}</p>
+                    <p class="texto-secundario" *ngIf="cancha.proximaReserva">
+                      Próxima disponibilidad: {{ cancha.ocupadaHasta }}
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  *ngIf="cancha.disponibleAhora"
+                  class="btn-reservar-ahora"
+                  (click)="seleccionarCanchaDisponible(cancha)"
+                  type="button">
+                  ⚡ Reservar Ahora
+                </button>
+
+                <div *ngIf="!cancha.disponibleAhora" class="mensaje-no-disponible">
+                  Vuelve en {{ cancha.ocupadaHasta }}
+                </div>
+              </div>
+
+              <!-- Resumen de disponibilidad -->
+              <div class="resumen-disponibilidad" *ngIf="canchasDisponiblesAhora.length > 0">
+                <p class="texto-info">
+                  📊 <strong>{{ obtenerCanchasDisponibles() }}</strong> de <strong>{{ canchas.length }}</strong> canchas disponibles ahora
+                </p>
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+
+      <!-- Sección: Datos del Cliente (se muestra después de ingresar RUT) -->
+      <div class="form-section" *ngIf="rutCliente.length >= 9">
+        <h2 class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2"/>
+            <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          Paso 2: {{ clienteEncontrado ? 'Verifica tus Datos' : 'Completa tus Datos' }}
+        </h2>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input
+              type="text"
+              id="nombre"
+              name="nombre"
+              [(ngModel)]="nombreCliente"
+              class="form-input"
+              [readonly]="clienteEncontrado"
+              placeholder="Juan"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="apellido" class="form-label">Apellido</label>
+            <input
+              type="text"
+              id="apellido"
+              name="apellido"
+              [(ngModel)]="apellidoCliente"
+              class="form-input"
+              [readonly]="clienteEncontrado"
+              placeholder="Pérez"
+              required
+            >
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="email" class="form-label">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              [(ngModel)]="emailCliente"
+              class="form-input"
+              [readonly]="clienteEncontrado"
+              placeholder="juan@email.com"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="telefono" class="form-label">Teléfono</label>
+            <input
+              type="tel"
+              id="telefono"
+              name="telefono"
+              [(ngModel)]="telefonoCliente"
+              class="form-input"
+              [readonly]="clienteEncontrado"
+              placeholder="+56 9 1234 5678"
+              required
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección: Selección de Cancha -->
+      <div class="form-section">
+        <h2 class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+            <line x1="12" y1="3" x2="12" y2="21" stroke="currentColor" stroke-width="2"/>
+            <circle cx="12" cy="12" r="2" fill="currentColor"/>
+          </svg>
+          Paso 3: Selección de Cancha
+        </h2>
+
+        <div class="form-group">
+          <label for="cancha" class="form-label">Cancha Deportiva</label>
+          <select
+            id="cancha"
+            name="cancha"
+            [(ngModel)]="canchaSeleccionadaId"
+            (ngModelChange)="onCanchaChangeById($event)"
+            class="form-input form-select"
+            required
+          >
+            <option value="">Selecciona una cancha...</option>
+            <option *ngFor="let cancha of canchas" [value]="cancha.id">
+              {{ cancha.nombre }} - {{ cancha.tipo }} - ${{ cancha.precioPorHora.toLocaleString('es-CL') }} CLP/hora
+            </option>
+          </select>
+        </div>
+
+        <!-- Información de la cancha seleccionada -->
+        <div class="cancha-info" *ngIf="canchaSeleccionada">
+          <div class="info-card">
+            <div class="info-header">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              <h3>{{ canchaSeleccionada.nombre }}</h3>
+            </div>
+            <p class="info-description">{{ canchaSeleccionada.descripcion }}</p>
+            <div class="info-details">
+              <span class="info-badge tipo-{{ canchaSeleccionada.tipo.toLowerCase() }}">
+                {{ canchaSeleccionada.tipo }}
+              </span>
+              <span class="info-price">
+                ${{ canchaSeleccionada.precioPorHora.toLocaleString('es-CL') }} CLP/hora
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección: Fecha y Horario -->
+      <div class="form-section">
+        <h2 class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+            <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2"/>
+            <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2"/>
+            <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          Paso 4: Fecha y Horario
+        </h2>
+
+        <div class="form-group">
+          <label for="fecha" class="form-label">Fecha de Reserva</label>
+          <input
+            type="date"
+            id="fecha"
+            name="fecha"
+            [(ngModel)]="fechaReserva"
+            class="form-input"
+            [min]="fechaReserva"
+            required
+          >
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="horaInicio" class="form-label">Hora Inicio</label>
+            <input
+              type="time"
+              id="horaInicio"
+              name="horaInicio"
+              [(ngModel)]="horaInicio"
+              (ngModelChange)="onHoraInicioChange()"
+              class="form-input"
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="horaFin" class="form-label">Hora Fin</label>
+            <input
+              type="time"
+              id="horaFin"
+              name="horaFin"
+              [(ngModel)]="horaFin"
+              (ngModelChange)="calcularPrecio()"
+              class="form-input"
+              required
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección: Método de Pago -->
+      <div class="form-section">
+        <h2 class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/>
+            <path d="M2 10h20" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          Paso 5: Método de Pago
+        </h2>
+
+        <div class="payment-options">
+          <label
+            *ngFor="let pago of tiposPago"
+            class="payment-option"
+            [class.selected]="tipoPago === pago.valor"
+          >
+            <input
+              type="radio"
+              name="tipoPago"
+              [value]="pago.valor"
+              [(ngModel)]="tipoPago"
+              required
+            >
+            <div class="payment-content">
+              <span class="payment-icon">{{ pago.icono }}</span>
+              <span class="payment-name">{{ pago.nombre }}</span>
+            </div>
+            <div class="payment-check">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </div>
+          </label>
+
+          <!-- Opción: Por Pagar (Reserva telefónica) -->
+          <label
+            class="payment-option payment-option-por-pagar"
+            [class.selected]="tipoPago === 'por_pagar'"
+          >
+            <input
+              type="radio"
+              name="tipoPago"
+              value="por_pagar"
+              [(ngModel)]="tipoPago"
+              required
+            >
+            <div class="payment-content">
+              <span class="payment-icon">📞</span>
+              <span class="payment-name">Por Pagar</span>
+              <small class="payment-subtitle">Reserva telefónica - Pago al llegar</small>
+            </div>
+            <div class="payment-check">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </div>
+          </label>
+        </div>
+
+        <!-- Mensaje informativo cuando se selecciona "Por Pagar" -->
+        <div class="alerta-por-pagar" *ngIf="tipoPago === 'por_pagar'">
+          <div class="alerta-por-pagar-content">
+            <div>
+              <h4>ℹ️ Reserva con Pago Pendiente</h4>
+              <p>Esta reserva será confirmada, pero el cliente deberá realizar el pago al momento del check-in.</p>
+              <p><strong>Importante:</strong> El cliente debe presentar su RUT al llegar para completar el pago.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Resumen de Precio -->
+      <div class="precio-resumen" *ngIf="precioTotal > 0">
+        <div class="precio-card">
+          <div class="precio-label">Total a Pagar</div>
+          <div class="precio-valor">${{ precioTotal.toLocaleString('es-CL') }} CLP</div>
+          <div class="precio-detalle" *ngIf="canchaSeleccionada">
+            {{ canchaSeleccionada.tipo }} - {{ horaInicio }} a {{ horaFin }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Mensajes -->
+      <div class="error-message" *ngIf="errorMessage">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+          <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2"/>
+          <line x1="12" y1="16" x2="12.01" y2="16" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        {{ errorMessage }}
+      </div>
+
+      <!-- Botones -->
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="limpiarFormulario()">
+          Limpiar
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="isLoading">
+          <svg *ngIf="!isLoading" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          <span *ngIf="isLoading" class="spinner"></span>
+          {{ isLoading ? 'Procesando...' : 'Confirmar Reserva' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Mensaje de Éxito -->
+  <div class="success-card" *ngIf="!mostrarFormulario && successMessage">
+    <div class="success-icon">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+        <path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2"/>
+      </svg>
+    </div>
+    <h2>¡Reserva Confirmada!</h2>
+    <p class="success-message">{{ successMessage }}</p>
+
+    <div class="resumen-reserva">
+      <h3>Resumen de tu Reserva</h3>
+      <div class="resumen-item">
+        <span class="resumen-label">Cliente:</span>
+        <span class="resumen-valor">{{ nombreCliente }} {{ apellidoCliente }}</span>
+      </div>
+      <div class="resumen-item">
+        <span class="resumen-label">RUT:</span>
+        <span class="resumen-valor">{{ rutCliente }}</span>
+      </div>
+      <div class="resumen-item">
+        <span class="resumen-label">Email:</span>
+        <span class="resumen-valor">{{ emailCliente }}</span>
+      </div>
+      <div class="resumen-item">
+        <span class="resumen-label">Teléfono:</span>
+        <span class="resumen-valor">{{ telefonoCliente }}</span>
+      </div>
+      <div class="resumen-item" *ngIf="canchaSeleccionada">
+        <span class="resumen-label">Cancha:</span>
+        <span class="resumen-valor">{{ canchaSeleccionada.nombre }}</span>
+      </div>
+      <div class="resumen-item">
+        <span class="resumen-label">Fecha:</span>
+        <span class="resumen-valor">{{ fechaReserva }}</span>
+      </div>
+      <div class="resumen-item">
+        <span class="resumen-label">Horario:</span>
+        <span class="resumen-valor">{{ horaInicio }} - {{ horaFin }}</span>
+      </div>
+      <div class="resumen-item">
+        <span class="resumen-label">Método de Pago:</span>
+        <span class="resumen-valor">{{ obtenerNombrePago(tipoPago) }}</span>
+      </div>
+      <div class="resumen-item total">
+        <span class="resumen-label">Total:</span>
+        <span class="resumen-valor">${{ precioTotal.toLocaleString('es-CL') }} CLP</span>
+      </div>
+    </div>
+
+    <button class="btn-primary" (click)="nuevaReserva()">
+      Nueva Reserva
+    </button>
+  </div>
+</div>
+

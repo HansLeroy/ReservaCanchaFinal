@@ -1,0 +1,165 @@
+<div class="cancelar-reserva-container">
+  <!-- Botón Volver -->
+  <button class="btn-volver" (click)="volver()">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Volver al Inicio
+  </button>
+
+  <div class="header">
+    <h1>🚫 Cancelar Reserva</h1>
+    <p class="subtitle">Busca las reservas de un cliente por RUT y cancélalas si es necesario</p>
+  </div>
+
+  <!-- Formulario de búsqueda -->
+  <div class="search-section">
+    <div class="search-card">
+      <h2>Buscar Cliente</h2>
+
+      <div class="input-group">
+        <label for="rut">RUT del Cliente</label>
+        <input
+          type="text"
+          id="rut"
+          [(ngModel)]="rutCliente"
+          placeholder="Ej: 12345678-9"
+          (keyup.enter)="buscarReservas()"
+          [disabled]="buscando"
+        />
+      </div>
+
+      <div class="button-group">
+        <button
+          class="btn btn-primary"
+          (click)="buscarReservas()"
+          [disabled]="buscando || !rutCliente"
+        >
+          <span *ngIf="!buscando">🔍 Buscar Reservas</span>
+          <span *ngIf="buscando">⏳ Buscando...</span>
+        </button>
+
+        <button
+          class="btn btn-secondary"
+          (click)="limpiar()"
+          [disabled]="buscando"
+        >
+          🔄 Limpiar
+        </button>
+      </div>
+
+      <!-- Mensajes de error -->
+      <div class="alert alert-error" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Mensajes de éxito -->
+      <div class="alert alert-success" *ngIf="successMessage">
+        {{ successMessage }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Resultados de búsqueda -->
+  <div class="results-section" *ngIf="clienteEncontrado">
+
+    <!-- Información del cliente -->
+    <div class="client-info" *ngIf="reservas.length > 0">
+      <h3>📋 Cliente: {{ reservas[0].nombreCliente }} {{ reservas[0].apellidoCliente }}</h3>
+      <p><strong>RUT:</strong> {{ reservas[0].rutCliente }}</p>
+      <p><strong>Email:</strong> {{ reservas[0].emailCliente }}</p>
+      <p><strong>Teléfono:</strong> {{ reservas[0].telefonoCliente }}</p>
+      <p><strong>Total de reservas:</strong> {{ reservas.length }}</p>
+      <p><strong>Reservas pendientes:</strong> {{ reservasPendientes.length }}</p>
+    </div>
+
+    <!-- Lista de reservas pendientes -->
+    <div class="reservas-list" *ngIf="reservasPendientes.length > 0">
+      <h2>⚡ Reservas Pendientes</h2>
+
+      <!-- Actualiza la plantilla para usar reservasFormateadas -->
+      <div class="reserva-card" *ngFor="let reserva of reservasFormateadas">
+        <div class="reserva-header">
+          <span class="reserva-id">Reserva #{{ reserva.id }}</span>
+          <span class="reserva-estado estado-confirmada">{{ reserva.estado }}</span>
+        </div>
+
+        <div class="reserva-body">
+          <div class="reserva-info">
+            <div class="info-item">
+              <span class="info-label">📅 Fecha:</span>
+              <span class="info-value">{{ reserva.fechaFormateada }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">⏰ Horario:</span>
+              <span class="info-value">{{ reserva.fechaHoraInicio | date: 'HH:mm' }} - {{ reserva.fechaHoraFin | date: 'HH:mm' }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">🏟️ Cancha:</span>
+              <span class="info-value">Cancha #{{ reserva.canchaId }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">💰 Monto:</span>
+              <span class="info-value">${{ reserva.montoFormateado }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">💳 Tipo de Pago:</span>
+              <span class="info-value">{{ reserva.tipoPago }}</span>
+            </div>
+          </div>
+
+          <div class="reserva-actions">
+            <button
+              class="btn btn-cancel"
+              (click)="cancelarReserva(reserva)"
+            >
+              🚫 Cancelar Reserva
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Historial de reservas canceladas -->
+    <div class="reservas-canceladas" *ngIf="reservasCanceladas.length > 0">
+      <h2>📜 Historial de Cancelaciones</h2>
+
+      <div class="reserva-card cancelada" *ngFor="let reserva of reservasCanceladas">
+        <div class="reserva-header">
+          <span class="reserva-id">Reserva #{{ reserva.id }}</span>
+          <span class="reserva-estado estado-cancelada">{{ reserva.estado }}</span>
+        </div>
+
+        <div class="reserva-body">
+          <div class="reserva-info">
+            <div class="info-item">
+              <span class="info-label">📅 Fecha:</span>
+              <span class="info-value">{{ formatearFecha(reserva.fechaHoraInicio) }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">⏰ Horario:</span>
+              <span class="info-value">{{ reserva.fechaHoraInicio | date: 'HH:mm' }} - {{ reserva.fechaHoraFin | date: 'HH:mm' }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">🏟️ Cancha:</span>
+              <span class="info-value">Cancha #{{ reserva.canchaId }}</span>
+            </div>
+
+            <div class="info-item">
+              <span class="info-label">💰 Monto:</span>
+              <span class="info-value">${{ formatearMonto(reserva.montoTotal) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+

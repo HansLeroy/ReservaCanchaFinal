@@ -1,0 +1,56 @@
+# ===== BACKEND (Maven) =====
+backend/target/
+backend/*.iml
+backend/.classpath
+backend/.project
+backend/.settings/
+
+# ===== FRONTEND (Angular/Node) =====
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# ===== IDE =====
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.DS_Store
+
+# ===== Build =====
+*.class
+*.log
+*.jar
+*.war
+*.ear
+
+# ===== Sistema =====
+Thumbs.db
+Desktop.ini
+
+# ===== Temporal =====
+*.tmp
+*.temp
+*.swp
+*.bak
+
+# ===== Git =====
+.git/
+
+# ===== Documentación generada =====
+docs/build/
+
+# ===== Archivos sensibles y de entorno =====
+.env
+.env.local
+.env.production
+.env.railway
+*.pem
+*.key
+application-prod.properties.local
+
+

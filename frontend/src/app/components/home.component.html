@@ -1,0 +1,195 @@
+<div class="home-container">
+  <!-- Fondo deportivo -->
+  <div class="background-pattern"></div>
+
+  <!-- Botón Cerrar Sesión -->
+  <button class="btn-cerrar-sesion" (click)="salir()" title="Cerrar Sesión">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Cerrar Sesión
+  </button>
+
+  <!-- Header Principal -->
+  <div class="header">
+    <div class="logo-container">
+      <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+        <path d="M12 2v20M2 12h20" stroke="currentColor" stroke-width="2"/>
+        <circle cx="12" cy="12" r="3" fill="currentColor"/>
+      </svg>
+      <h1>ReservaCancha</h1>
+    </div>
+    <p class="subtitle">Sistema de Gestión de Canchas Deportivas</p>
+  </div>
+
+  <!-- Menú Principal -->
+  <div class="menu-principal">
+
+    <!-- Card de Reservas -->
+    <div class="menu-card reservas-card" (click)="navegarAReservas()">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+          <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2"/>
+          <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2"/>
+          <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2"/>
+          <circle cx="8" cy="14" r="1" fill="currentColor"/>
+          <circle cx="12" cy="14" r="1" fill="currentColor"/>
+          <circle cx="16" cy="14" r="1" fill="currentColor"/>
+          <circle cx="8" cy="18" r="1" fill="currentColor"/>
+          <circle cx="12" cy="18" r="1" fill="currentColor"/>
+        </svg>
+      </div>
+      <div class="card-content">
+        <h2 class="card-title">Nueva Reserva</h2>
+        <p class="card-description">Reserva una cancha deportiva ingresando tus datos y eligiendo horario</p>
+        <div class="card-features">
+          <span class="feature">✓ Búsqueda por RUT</span>
+          <span class="feature">✓ Selección de cancha</span>
+          <span class="feature">✓ Elección de horario</span>
+          <span class="feature">✓ Métodos de pago</span>
+        </div>
+      </div>
+      <div class="card-arrow">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Card de Cancelar Reservas -->
+    <div class="menu-card cancelar-card" (click)="navegarACancelar()">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="currentColor" stroke-width="2"/>
+          <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2"/>
+          <line x1="18" y1="4" x2="6" y2="20" stroke="red" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="card-content">
+        <h2 class="card-title">Cancelar Reserva</h2>
+        <p class="card-description">Busca reservas por RUT del cliente y cancélalas si es necesario</p>
+        <div class="card-features">
+          <span class="feature">✓ Buscar por RUT</span>
+          <span class="feature">✓ Ver reservas pendientes</span>
+          <span class="feature">✓ Cancelar reservas</span>
+          <span class="feature">✓ Historial de cancelaciones</span>
+        </div>
+      </div>
+      <div class="card-arrow">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Card de Check-In -->
+    <div class="menu-card checkin-card" (click)="navegarACheckin()">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="card-content">
+        <h2 class="card-title">Check-In</h2>
+        <p class="card-description">Realiza el check-in y completa el pago de reservas pendientes</p>
+        <div class="card-features">
+          <span class="feature">✓ Buscar por RUT</span>
+          <span class="feature">✓ Ver reservas pendientes</span>
+          <span class="feature">✓ Completar pago</span>
+          <span class="feature">✓ Confirmar llegada</span>
+        </div>
+      </div>
+      <div class="card-arrow">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Card de Reportes -->
+    <div class="menu-card reportes-card" (click)="navegarAReportes()">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" fill="currentColor"/>
+          <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="card-content">
+        <h2 class="card-title">Reportes de Ganancias</h2>
+        <p class="card-description">Consulta las ganancias, pagos realizados y estadísticas por período</p>
+        <div class="card-features">
+          <span class="feature">✓ Filtros por fecha</span>
+          <span class="feature">✓ Análisis por cancha</span>
+          <span class="feature">✓ Tabla de pagos</span>
+          <span class="feature">✓ Exportar e imprimir</span>
+        </div>
+      </div>
+      <div class="card-arrow">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Card de Usuarios (Solo ADMIN) -->
+    <div class="menu-card usuarios-card" (click)="navegarAUsuarios()" *ngIf="esAdmin()">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" stroke-width="2"/>
+          <circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="card-content">
+        <h2 class="card-title">Gestión de Usuarios</h2>
+        <p class="card-description">Crea y administra usuarios del sistema - Solo Administradores</p>
+        <div class="card-features">
+          <span class="feature">✓ Crear nuevos usuarios</span>
+          <span class="feature">✓ Asignar roles</span>
+          <span class="feature">✓ Activar/Desactivar</span>
+          <span class="feature">✓ Control de acceso</span>
+        </div>
+      </div>
+      <div class="card-arrow">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Card de Canchas (Solo ADMIN) -->
+    <div class="menu-card canchas-card" (click)="navegarACanchas()" *ngIf="esAdmin()">
+      <div class="card-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+          <path d="M3 9h18M9 3v18" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="card-content">
+        <h2 class="card-title">Gestión de Canchas</h2>
+        <p class="card-description">Administra todas las canchas deportivas del centro</p>
+        <div class="card-features">
+          <span class="feature">✓ Crear nuevas canchas</span>
+          <span class="feature">✓ Editar información</span>
+          <span class="feature">✓ Activar/Desactivar</span>
+          <span class="feature">✓ Control de precios</span>
+        </div>
+      </div>
+      <div class="card-arrow">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2"/>
+        </svg>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>ReservaCancha © 2026 - Sistema de Gestión Deportiva</p>
+  </div>
+</div>
+

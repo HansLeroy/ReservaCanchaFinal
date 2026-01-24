@@ -1,0 +1,1377 @@
+/* Contenedor principal */
+.reserva-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Botón Volver */
+.btn-volver {
+  position: fixed;
+  top: 2rem;
+  left: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 1000;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-volver:hover {
+  background: #667eea;
+  color: white;
+  transform: translateX(-5px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-volver svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Patrón de fondo deportivo */
+.background-pattern {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.1;
+  background-image:
+    repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.1) 35px, rgba(255,255,255,.1) 70px),
+    repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(255,255,255,.1) 35px, rgba(255,255,255,.1) 70px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.logo-icon {
+  width: 50px;
+  height: 50px;
+  color: white;
+}
+
+.header h1 {
+  color: white;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+.subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+/* Card de reserva */
+.reserva-card {
+  max-width: 900px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.reserva-form {
+  padding: 2.5rem;
+}
+
+/* Secciones del formulario */
+.form-section {
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.form-section:last-child {
+  border-bottom: none;
+}
+
+/* Sección destacada (para RUT) */
+.section-destacada {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  padding: 2rem;
+  border-radius: 15px;
+  border: 2px solid #667eea;
+  margin-bottom: 3rem;
+}
+
+.rut-destacado {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.form-label-big {
+  display: block;
+  margin-bottom: 0.75rem;
+  color: #667eea;
+  font-weight: 600;
+  font-size: 1.2rem;
+  text-align: center;
+}
+
+.form-input-big {
+  font-size: 1.5rem !important;
+  padding: 1.25rem 1.5rem !important;
+  text-align: center;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.form-input-big::placeholder {
+  font-size: 1.2rem;
+  font-weight: 400;
+  letter-spacing: normal;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #667eea;
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.section-title svg {
+  width: 28px;
+  height: 28px;
+}
+
+/* Filas del formulario */
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Grupos de formulario */
+.form-group {
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+/* Estados del input */
+.input-loading {
+  border-color: #667eea !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='none' stroke='%23667eea' stroke-width='2'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.input-success {
+  border-color: #4CAF50 !important;
+  background-color: #f0fff4;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Mensaje de búsqueda */
+.busqueda-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: #f5f5f5;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  animation: slideDown 0.3s ease;
+}
+
+/* 🔴 BOTÓN COMPACTO DE DISPONIBILIDAD (dentro del Paso 1) */
+.disponibilidad-btn-container {
+  margin-top: 1.5rem;
+}
+
+.btn-disponibilidad-compacto {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(135deg, #ff5722 0%, #ff9800 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(255, 87, 34, 0.4);
+  animation: pulsoCompacto 3s ease-in-out infinite;
+}
+
+@keyframes pulsoCompacto {
+  0%, 100% {
+    box-shadow: 0 6px 20px rgba(255, 87, 34, 0.4);
+  }
+  50% {
+    box-shadow: 0 8px 28px rgba(255, 87, 34, 0.6);
+  }
+}
+
+.btn-disponibilidad-compacto:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(255, 87, 34, 0.6);
+}
+
+.btn-disponibilidad-compacto svg:first-child {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.btn-texto-compacto {
+  flex: 1;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.btn-texto-compacto strong {
+  font-size: 1.2rem;
+  display: block;
+}
+
+.btn-texto-compacto small {
+  font-size: 0.85rem;
+  opacity: 0.95;
+  font-weight: 400;
+}
+
+.btn-disponibilidad-compacto .btn-flecha {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.btn-disponibilidad-compacto:hover .btn-flecha {
+  transform: translateX(5px);
+}
+
+/* Panel de disponibilidad inline (dentro del formulario) */
+.panel-disponibilidad-inline {
+  margin-top: 1.5rem;
+  background: #fff;
+  border: 3px solid #ff9800;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 25px rgba(255, 152, 0, 0.3);
+  animation: slideDown 0.4s ease;
+}
+
+/* ⚠️ ALERTA DE RESERVAS PARA HOY */
+.alerta-reservas-hoy {
+  margin-top: 1.5rem;
+  background: linear-gradient(135deg, #fff5e6 0%, #ffe0b2 100%);
+  border: 3px solid #ff9800;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 20px rgba(255, 152, 0, 0.3);
+  animation: alertaPulse 2s ease-in-out infinite;
+}
+
+@keyframes alertaPulse {
+  0%, 100% {
+    box-shadow: 0 8px 20px rgba(255, 152, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 8px 30px rgba(255, 152, 0, 0.5);
+  }
+}
+
+.alerta-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #ff9800;
+}
+
+.alerta-header svg {
+  width: 32px;
+  height: 32px;
+  color: #ff6f00;
+  flex-shrink: 0;
+}
+
+.alerta-header h3 {
+  margin: 0;
+  color: #e65100;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.alerta-body {
+  color: #bf360c;
+}
+
+.alerta-mensaje {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.reservas-hoy-lista {
+  margin: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.reserva-hoy-item {
+  background: white;
+  border-radius: 10px;
+  padding: 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-left: 5px solid #ff9800;
+  transition: all 0.3s ease;
+}
+
+/* Resaltar reservas de HOY */
+.reserva-hoy-item.reserva-hoy {
+  border-left: 5px solid #f44336;
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+  box-shadow: 0 6px 15px rgba(244, 67, 54, 0.3);
+  animation: resaltarHoy 2s ease-in-out infinite;
+}
+
+@keyframes resaltarHoy {
+  0%, 100% {
+    box-shadow: 0 6px 15px rgba(244, 67, 54, 0.3);
+  }
+  50% {
+    box-shadow: 0 8px 20px rgba(244, 67, 54, 0.5);
+  }
+}
+
+/* Resaltar reservas de MAÑANA */
+.reserva-hoy-item.reserva-manana {
+  border-left: 5px solid #ffa726;
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  box-shadow: 0 6px 15px rgba(255, 167, 38, 0.3);
+}
+
+.reserva-hoy-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.reserva-hoy-icon {
+  font-size: 2rem;
+}
+
+.reserva-hoy-detalles {
+  flex: 1;
+}
+
+.reserva-hoy-detalles p {
+  margin: 0.25rem 0;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.reserva-hoy-fecha {
+  font-size: 1.15rem !important;
+  color: #e65100 !important;
+  font-weight: 700 !important;
+  margin-bottom: 0.5rem !important;
+  text-transform: uppercase;
+  padding: 0.25rem 0.5rem;
+  background: rgba(255, 152, 0, 0.1);
+  border-radius: 5px;
+  display: inline-block;
+}
+
+.reserva-hoy-horario {
+  font-size: 1.1rem !important;
+  color: #1976d2 !important;
+  font-weight: 600;
+}
+
+.btn-cancelar-reserva-mini {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.btn-cancelar-reserva-mini:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(244, 67, 54, 0.4);
+}
+
+.alerta-acciones {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px dashed #ff9800;
+}
+
+.alerta-pregunta {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #e65100;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.alerta-botones {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.btn-alerta {
+  padding: 0.875rem 1.5rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-nueva-reserva {
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+}
+
+.btn-nueva-reserva:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.spinner-small {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+.text-success {
+  color: #4CAF50;
+  font-weight: 500;
+}
+
+.text-info {
+  color: #667eea;
+  font-weight: 500;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-input[readonly] {
+  background-color: #f0fff4;
+  border-color: #4CAF50;
+  color: #2e7d32;
+  cursor: not-allowed;
+}
+
+.form-select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23667eea' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 3rem;
+}
+
+.form-help {
+  display: block;
+  margin-top: 0.375rem;
+  color: #666;
+  font-size: 0.875rem;
+}
+
+/* Información de cancha */
+.cancha-info {
+  margin-top: 1.5rem;
+}
+
+.info-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.info-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.info-header svg {
+  width: 24px;
+  height: 24px;
+}
+
+.info-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.info-description {
+  margin: 0.75rem 0;
+  opacity: 0.95;
+  line-height: 1.5;
+}
+
+.info-details {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.info-badge {
+  padding: 0.375rem 0.875rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.tipo-futbol {
+  background: rgba(76, 175, 80, 0.3);
+}
+
+.tipo-padel {
+  background: rgba(255, 152, 0, 0.3);
+}
+
+.tipo-basquetbol {
+  background: rgba(244, 67, 54, 0.3);
+}
+
+.info-price {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+/* Opciones de pago */
+.payment-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.payment-option {
+  position: relative;
+  display: block;
+  cursor: pointer;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+}
+
+.payment-option:hover {
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.payment-option.selected {
+  border-color: #667eea;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+}
+
+.payment-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.payment-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.payment-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.payment-name {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #333;
+  text-align: center;
+}
+
+.payment-check {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 24px;
+  height: 24px;
+  background: #667eea;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.3s ease;
+}
+
+.payment-option.selected .payment-check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.payment-check svg {
+  width: 16px;
+  height: 16px;
+  color: white;
+}
+
+/* Resumen de precio */
+.precio-resumen {
+  margin: 2rem 0;
+}
+
+.precio-card {
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3);
+}
+
+.precio-label {
+  font-size: 1rem;
+  opacity: 0.95;
+  margin-bottom: 0.5rem;
+}
+
+.precio-valor {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0.5rem 0;
+}
+
+.precio-detalle {
+  font-size: 0.95rem;
+  opacity: 0.9;
+  margin-top: 0.5rem;
+}
+
+/* Mensajes */
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: #fee;
+  border: 2px solid #fcc;
+  border-radius: 10px;
+  color: #c33;
+  margin-bottom: 1.5rem;
+}
+
+.error-message svg {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+/* Botones */
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn-primary,
+.btn-secondary {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary svg {
+  width: 20px;
+  height: 20px;
+}
+
+.btn-secondary {
+  background: #f5f5f5;
+  color: #666;
+  border: 2px solid #e0e0e0;
+}
+
+.btn-secondary:hover {
+  background: #e0e0e0;
+}
+
+/* Spinner */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Card de éxito */
+.success-card {
+  max-width: 700px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 20px;
+  padding: 3rem;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 1;
+}
+
+.success-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.5rem;
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: successPulse 0.6s ease;
+}
+
+@keyframes successPulse {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.success-icon svg {
+  width: 50px;
+  height: 50px;
+  color: white;
+}
+
+.success-card h2 {
+  color: #333;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.success-message {
+  color: #4CAF50;
+  font-size: 1.2rem;
+  font-weight: 500;
+  margin-bottom: 2rem;
+}
+
+/* Resumen de reserva */
+.resumen-reserva {
+  background: #f9f9f9;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+  text-align: left;
+}
+
+.resumen-reserva h3 {
+  color: #667eea;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.resumen-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.resumen-item:last-child {
+  border-bottom: none;
+}
+
+.resumen-item.total {
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  border-top: 2px solid #667eea;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.resumen-label {
+  color: #666;
+  font-weight: 500;
+}
+
+.resumen-valor {
+  color: #333;
+  font-weight: 600;
+}
+
+/* ⚡ DISPONIBILIDAD INMEDIATA */
+.disponibilidad-inmediata-container {
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.btn-disponibilidad-inmediata {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, #ff5722 0%, #ff9800 100%);
+  color: white;
+  border: none;
+  border-radius: 15px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(255, 87, 34, 0.4);
+  animation: pulsoDisponibilidad 3s ease-in-out infinite;
+}
+
+@keyframes pulsoDisponibilidad {
+  0%, 100% {
+    box-shadow: 0 8px 25px rgba(255, 87, 34, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 12px 35px rgba(255, 87, 34, 0.6);
+    transform: scale(1.02);
+  }
+}
+
+.btn-disponibilidad-inmediata:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 40px rgba(255, 87, 34, 0.6);
+}
+
+.btn-disponibilidad-inmediata svg:first-child {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.btn-texto {
+  flex: 1;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.btn-texto strong {
+  font-size: 1.3rem;
+  display: block;
+}
+
+.btn-texto small {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  font-weight: 400;
+}
+
+.btn-flecha {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.btn-disponibilidad-inmediata:hover .btn-flecha {
+  transform: translateX(5px);
+}
+
+/* Panel de disponibilidad */
+.panel-disponibilidad {
+  margin-top: 1.5rem;
+  background: white;
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  animation: slideDown 0.4s ease;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 3px solid #ff9800;
+}
+
+.panel-titulo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.panel-titulo svg {
+  width: 48px;
+  height: 48px;
+  color: #ff5722;
+  flex-shrink: 0;
+}
+
+.panel-titulo h3 {
+  margin: 0;
+  color: #ff5722;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.hora-actual {
+  margin: 0.25rem 0 0 0;
+  color: #666;
+  font-size: 1rem;
+}
+
+.btn-refrescar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: #f5f5f5;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  color: #666;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-refrescar:hover:not(:disabled) {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+.btn-refrescar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-refrescar svg {
+  width: 18px;
+  height: 18px;
+}
+
+.spinner-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  gap: 1rem;
+}
+
+.spinner-grande {
+  width: 60px;
+  height: 60px;
+  border: 5px solid rgba(255, 87, 34, 0.2);
+  border-top-color: #ff5722;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Grid de canchas disponibles */
+.canchas-disponibles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.cancha-disponible-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 3px solid #e0e0e0;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.cancha-disponible-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.cancha-disponible-card.cancha-libre {
+  border-color: #4caf50;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
+}
+
+.cancha-disponible-card.cancha-libre::before {
+  background: linear-gradient(90deg, #4caf50 0%, #8bc34a 100%);
+}
+
+.cancha-disponible-card.cancha-ocupada {
+  border-color: #f44336;
+  opacity: 0.7;
+}
+
+.cancha-disponible-card.cancha-ocupada::before {
+  background: linear-gradient(90deg, #f44336 0%, #ff5722 100%);
+}
+
+.cancha-status {
+  margin-bottom: 1rem;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-libre {
+  background: linear-gradient(135deg, #4caf50 0%, #8bc34a 100%);
+  color: white;
+  box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+}
+
+.badge-ocupada {
+  background: linear-gradient(135deg, #f44336 0%, #ff5722 100%);
+  color: white;
+  box-shadow: 0 4px 10px rgba(244, 67, 54, 0.3);
+}
+
+.cancha-info-principal h4 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.cancha-tipo {
+  margin: 0.25rem 0;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.cancha-precio {
+  margin: 0.5rem 0 0 0;
+  color: #ff5722;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.cancha-disponibilidad-info {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.info-libre {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+}
+
+.info-ocupada {
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+}
+
+.texto-destacado {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.texto-secundario {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.btn-reservar-ahora {
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.btn-reservar-ahora:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
+}
+
+.mensaje-no-disponible {
+  width: 100%;
+  padding: 1rem;
+  background: #f5f5f5;
+  border: 2px dashed #ccc;
+  border-radius: 10px;
+  text-align: center;
+  color: #666;
+  font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .reserva-container {
+    padding: 1rem;
+    padding-top: 5rem;
+  }
+
+  .btn-volver {
+    top: 1rem;
+    left: 1rem;
+    right: 1rem;
+    justify-content: center;
+  }
+
+  .header h1 {
+    font-size: 2rem;
+  }
+
+  .reserva-form,
+  .success-card {
+    padding: 1.5rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .precio-valor {
+    font-size: 2rem;
+  }
+
+  .canchas-disponibles-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .btn-disponibilidad-inmediata {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .btn-texto strong {
+    font-size: 1.1rem;
+  }
+}
+
+/* Mensaje cuando no hay canchas en el sistema */
+.mensaje-sin-canchas {
+  padding: 3rem 2rem;
+  text-align: center;
+  background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+  border-radius: 12px;
+  border: 2px dashed #ffa726;
+  margin: 1rem 0;
+}
+
+.mensaje-sin-canchas-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.mensaje-sin-canchas svg {
+  width: 64px;
+  height: 64px;
+  color: #f57c00;
+  opacity: 0.8;
+}
+
+.mensaje-sin-canchas h4 {
+  margin: 0;
+  color: #e65100;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.mensaje-sin-canchas p {
+  margin: 0;
+  color: #f57c00;
+  font-size: 1rem;
+}
+
+/* Resumen de disponibilidad */
+.resumen-disponibilidad {
+  grid-column: 1 / -1;
+  padding: 1rem;
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 10px;
+  border: 2px solid #66bb6a;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.resumen-disponibilidad .texto-info {
+  margin: 0;
+  color: #2e7d32;
+  font-size: 1.1rem;
+}
+
+.resumen-disponibilidad strong {
+  color: #1b5e20;
+  font-weight: 700;
+}
+

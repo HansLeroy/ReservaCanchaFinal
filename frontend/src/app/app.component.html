@@ -1,0 +1,8 @@
+<app-login *ngIf="vistaActual === 'login'" (loginExitoso)="onLoginExitoso()"></app-login>
+<app-home *ngIf="vistaActual === 'home' && usuarioAutenticado" (irAReservas)="mostrarReservas()" (irAReportes)="mostrarReportes()" (irAUsuarios)="mostrarUsuarios()" (irACancelar)="mostrarCancelar()" (irACanchas)="mostrarCanchas()" (irACheckin)="mostrarCheckin()" (cerrarSesion)="cerrarSesion()"></app-home>
+<app-reserva *ngIf="vistaActual === 'reservas' && usuarioAutenticado" (volverInicio)="mostrarHome()"></app-reserva>
+<app-reportes *ngIf="vistaActual === 'reportes' && usuarioAutenticado" (volverInicio)="mostrarHome()" (irAReservas)="mostrarReservas()"></app-reportes>
+<app-usuarios *ngIf="vistaActual === 'usuarios' && usuarioAutenticado" (volverInicio)="mostrarHome()"></app-usuarios>
+<app-cancelar-reserva *ngIf="vistaActual === 'cancelar' && usuarioAutenticado" (volverInicio)="mostrarHome()"></app-cancelar-reserva>
+<app-canchas *ngIf="vistaActual === 'canchas' && usuarioAutenticado" (volverInicio)="mostrarHome()"></app-canchas>
+<app-checkin *ngIf="vistaActual === 'checkin' && usuarioAutenticado" (volverInicio)="mostrarHome()"></app-checkin>

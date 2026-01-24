@@ -1,0 +1,174 @@
+<div class="checkin-container">
+  <div class="background-pattern"></div>
+
+  <!-- Botón Volver -->
+  <button class="btn-volver" (click)="volverInicio.emit()" title="Volver al Inicio">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Volver al Inicio
+  </button>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-container">
+      <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2"/>
+      </svg>
+      <h1>Check-In</h1>
+    </div>
+    <p class="subtitle">Busca tu reserva pendiente y completa el pago</p>
+  </div>
+
+  <!-- Mensajes -->
+  <div class="alert alert-error" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="alert alert-success" *ngIf="successMessage">
+    {{ successMessage }}
+  </div>
+
+  <!-- Búsqueda por RUT -->
+  <div class="checkin-card" *ngIf="!mostrandoPago && !successMessage">
+    <div class="form-section">
+      <h2 class="section-title">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="2"/>
+          <path d="M3 10h18" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        Ingresa tu RUT
+      </h2>
+
+      <div class="rut-destacado">
+        <label for="rut" class="form-label-big">RUT del Cliente</label>
+        <input
+          type="text"
+          id="rut"
+          name="rut"
+          [(ngModel)]="rutCliente"
+          (keyup.enter)="buscarReservas()"
+          class="form-input form-input-big"
+          placeholder="Ej: 12345678-9"
+          [disabled]="buscandoReservas"
+          autofocus
+        >
+        <button
+          class="btn-buscar"
+          (click)="buscarReservas()"
+          [disabled]="buscandoReservas || rutCliente.length < 9">
+          <span *ngIf="!buscandoReservas">Buscar Reservas</span>
+          <span *ngIf="buscandoReservas">Buscando...</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Lista de Reservas Pendientes -->
+    <div class="reservas-pendientes" *ngIf="reservasPendientes.length > 0">
+      <h3 class="lista-titulo">Reservas Pendientes de Pago</h3>
+
+      <div
+        class="reserva-item"
+        *ngFor="let reserva of reservasPendientes"
+        (click)="seleccionarReserva(reserva)">
+        <div class="reserva-info">
+          <div class="reserva-cancha">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>Cancha ID: {{ reserva.canchaId }}</span>
+          </div>
+          <div class="reserva-horario">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+              <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>{{ formatearHora(reserva.fechaHoraInicio) }} - {{ formatearHora(reserva.fechaHoraFin) }}</span>
+          </div>
+          <div class="reserva-monto">
+            <strong>${{ reserva.montoTotal.toLocaleString('es-CL') }} CLP</strong>
+          </div>
+        </div>
+        <div class="reserva-accion">
+          <button class="btn-checkin-item">
+            Realizar Check-In
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pantalla de Pago -->
+  <div class="pago-card" *ngIf="mostrandoPago && !successMessage">
+    <button class="btn-volver-lista" (click)="volverALista()">
+      ← Volver a la lista
+    </button>
+
+    <div class="pago-header">
+      <h2>Completar Pago</h2>
+      <div class="pago-resumen">
+        <div class="resumen-item">
+          <span class="resumen-label">Cliente:</span>
+          <span class="resumen-valor">{{ reservaSeleccionada.nombreCliente }} {{ reservaSeleccionada.apellidoCliente }}</span>
+        </div>
+        <div class="resumen-item">
+          <span class="resumen-label">Horario:</span>
+          <span class="resumen-valor">{{ formatearHora(reservaSeleccionada.fechaHoraInicio) }} - {{ formatearHora(reservaSeleccionada.fechaHoraFin) }}</span>
+        </div>
+        <div class="resumen-item resumen-total">
+          <span class="resumen-label">Total a Pagar:</span>
+          <span class="resumen-valor">${{ reservaSeleccionada.montoTotal.toLocaleString('es-CL') }} CLP</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3 class="section-title">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" stroke-width="2"/>
+          <path d="M2 10h20" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        Selecciona el Método de Pago
+      </h3>
+
+      <div class="payment-options">
+        <label
+          *ngFor="let pago of tiposPago"
+          class="payment-option"
+          [class.selected]="metodoPagoSeleccionado === pago.valor"
+        >
+          <input
+            type="radio"
+            name="metodoPago"
+            [value]="pago.valor"
+            [(ngModel)]="metodoPagoSeleccionado"
+          >
+          <div class="payment-content">
+            <span class="payment-icon">{{ pago.icono }}</span>
+            <span class="payment-name">{{ pago.nombre }}</span>
+          </div>
+          <div class="payment-check">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </div>
+        </label>
+      </div>
+
+      <button
+        class="btn-confirmar-pago"
+        (click)="confirmarCheckIn()"
+        [disabled]="!metodoPagoSeleccionado || isLoading">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2"/>
+        </svg>
+        <span *ngIf="!isLoading">Confirmar Pago y Check-In</span>
+        <span *ngIf="isLoading">Procesando...</span>
+      </button>
+    </div>
+  </div>
+</div>
+
