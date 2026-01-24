@@ -9,7 +9,7 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
       - key: DB_HOST
-        value: dpg-d5qf88c9c44c73d1tlag-a
+        value: dpg-d5qf88c9c44c73d1tlag-a.oregon-postgres.render.com
       - key: DB_PORT
         value: 5432
       - key: DB_NAME
@@ -18,12 +18,6 @@ services:
         value: reservacancha
       - key: DB_PASSWORD
         sync: false
-      - key: DATABASE_URL
-        sync: false
-      - key: DB_DRIVER
-        value: org.postgresql.Driver
-      - key: DB_DIALECT
-        value: org.hibernate.dialect.PostgreSQLDialect
       - key: FRONTEND_URL
         value: https://reservacancha-frontend.onrender.com
 
