@@ -14,7 +14,7 @@ services:
   # Backend (Web Service)
   - type: web
     name: reservacancha-backend
-    runtime: openjdk
+    # runtime: openjdk
     # The build command needs to be run from the backend directory
     buildCommand: "./backend/mvnw clean install"
     # The start command assumes the JAR is in the target directory
