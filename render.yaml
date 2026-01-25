@@ -1,7 +1,7 @@
 services:
   # Frontend (Static Site)
   - type: web
-    name: reservacancha-frontend
+    name: reservacancha-final-frontend
     env: static
     staticPublishPath: ./frontend/dist/reservacancha-frontend 
     # The build command needs to be run from the frontend directory
@@ -10,10 +10,9 @@ services:
       - type: rewrite
         source: /*
         destination: /index.html
-
   # Backend (Web Service)
   - type: web
-    name: reservacancha-backend
+    name: reservacancha-final-backend
     env: docker # Specify Docker environment
     dockerfilePath: ./backend/Dockerfile # Point to the Dockerfile
     envVars:
@@ -32,7 +31,6 @@ services:
         fromDatabase:
           name: reservacancha-db
           property: password
-
 databases:
   - name: reservacancha-db
     databaseName: reservacancha_db_prod # The name of the database inside postgres
