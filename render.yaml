@@ -14,10 +14,8 @@ services:
   # Backend (Web Service)
   - type: web
     name: reservacancha-backend
-    # The build command needs to be run from the backend directory
-    buildCommand: "./backend/mvnw clean install"
-    # The start command assumes the JAR is in the target directory
-    startCommand: "java -jar ./backend/target/reservacancha-backend-0.0.1-SNAPSHOT.jar"
+    env: docker # Specify Docker environment
+    dockerfilePath: ./backend/Dockerfile # Point to the Dockerfile
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
