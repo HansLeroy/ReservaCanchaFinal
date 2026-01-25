@@ -47,9 +47,14 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
            "ORDER BY r.fechaHoraInicio ASC")
     List<Reserva> findReservasConfirmadasSinCheckIn(@Param("fechaActual") LocalDateTime fechaActual);
 
+    // Método optimizado para obtener la última reserva de un cliente por su RUT
+    Optional<Reserva> findFirstByRutClienteOrderByFechaHoraInicioDesc(String rutCliente);
+
+    /*
     default Optional<Reserva> findUltimaReservaPorRut(String rut) {
         return findByRutCliente(rut).stream()
                 .max(java.util.Comparator.comparing(Reserva::getFechaHoraInicio));
     }
+    */
 }
 

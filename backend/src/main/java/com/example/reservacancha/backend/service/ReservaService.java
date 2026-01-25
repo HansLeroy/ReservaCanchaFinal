@@ -217,7 +217,7 @@ public class ReservaService {
     }
 
     public Optional<ClienteDTO> buscarClientePorRut(String rut) {
-        Optional<Reserva> ultimaReserva = reservaRepository.findUltimaReservaPorRut(rut);
+        Optional<Reserva> ultimaReserva = reservaRepository.findFirstByRutClienteOrderByFechaHoraInicioDesc(rut);
 
         if (ultimaReserva.isPresent()) {
             Reserva reserva = ultimaReserva.get();

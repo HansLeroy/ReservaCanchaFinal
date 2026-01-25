@@ -1,35 +1,43 @@
 services:
-  # Backend Spring Boot
-  - type: web
-    name: reservacancha-backend
-    plan: free
-    buildCommand: cd backend && ./mvnw clean package -DskipTests
-    startCommand: cd backend && java -jar target/reservacancha-backend-0.0.1-SNAPSHOT.jar --spring.profiles.active=prod
-    envVars:
-      - key: SPRING_PROFILES_ACTIVE
-        value: prod
-      - key: DB_HOST
-        value: dpg-d5qf88c9c44c73d1tlag-a.oregon-postgres.render.com
-      - key: DB_PORT
-        value: 5432
-      - key: DB_NAME
-        value: reservacancha
-      - key: DB_USERNAME
-        value: reservacancha
-      - key: DB_PASSWORD
-        sync: false
-      - key: FRONTEND_URL
-        value: https://reservacancha-frontend.onrender.com
-
-  # Frontend Angular
+  # Frontend (Static Site)
   - type: web
     name: reservacancha-frontend
     env: static
-    plan: free
-    buildCommand: cd frontend && npm install && npm run build
-    staticPublishPath: frontend/dist/reservacancha-frontend
+    staticPublishPath: ./frontend/dist/reservacancha-frontend 
+    # The build command needs to be run from the frontend directory
+    buildCommand: "cd frontend && npm install && npm run build"
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
 
+  # Backend (Web Service)
+  - type: web
+    name: reservacancha-backend
+    env: java
+    # The build command needs to be run from the backend directory
+    buildCommand: "./backend/mvnw clean install"
+    # The start command assumes the JAR is in the target directory
+    startCommand: "java -jar ./backend/target/reservacancha-backend-0.0.1-SNAPSHOT.jar"
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: SPRING_DATASOURCE_URL
+        # This will be provided by Render's PostgreSQL addon
+        fromDatabase:
+          name: reservacancha-db
+          property: connectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: reservacancha-db
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: reservacancha-db
+          property: password
+
+databases:
+  - name: reservacancha-db
+    databaseName: reservacancha_db_prod # The name of the database inside postgres
+    user: admin_reservacancha
+    plan: free # 'starter' or other plans for production use

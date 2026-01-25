@@ -11,7 +11,14 @@ import java.time.LocalDateTime;
  * Entidad que representa una reserva de cancha
  */
 @Entity
-@Table(name = "reserva")
+@Table(name = "reserva", indexes = {
+        @Index(name = "idx_reserva_cancha_id", columnList = "cancha_id"),
+        @Index(name = "idx_reserva_cliente_id", columnList = "cliente_id"),
+        @Index(name = "idx_reserva_estado", columnList = "estado"),
+        @Index(name = "idx_reserva_rut_cliente", columnList = "rut_cliente"),
+        @Index(name = "idx_reserva_rut_pago", columnList = "rut_cliente, pago_completado"),
+        @Index(name = "idx_reserva_checkin_status", columnList = "pago_completado, check_in_realizado, estado, fecha_hora_inicio")
+})
 public class Reserva {
 
     @Id
