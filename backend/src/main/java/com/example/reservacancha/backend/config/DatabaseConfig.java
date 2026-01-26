@@ -1,11 +1,13 @@
 package com.example.reservacancha.backend.config;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -18,54 +20,71 @@ import java.net.URISyntaxException;
 @Profile("prod")
 public class DatabaseConfig {
 
-    @PostConstruct
-    public void initDatabaseUrl() {
-        // Render puede proporcionar la URL como DATABASE_URL o SPRING_DATASOURCE_URL
-        String databaseUrl = System.getenv("DATABASE_URL");
+    @Value("${SPRING_DATASOURCE_URL:#{null}}")
+    private String datasourceUrl;
+
+    @Bean
+    public DataSource dataSource() {
+        // Obtener la URL desde la variable de entorno
+        String databaseUrl = System.getenv("SPRING_DATASOURCE_URL");
         if (databaseUrl == null || databaseUrl.isEmpty()) {
-            databaseUrl = System.getenv("SPRING_DATASOURCE_URL");
+            databaseUrl = System.getenv("DATABASE_URL");
+        }
+        if (databaseUrl == null || databaseUrl.isEmpty()) {
+            databaseUrl = datasourceUrl;
         }
 
-        if (databaseUrl != null && !databaseUrl.isEmpty()) {
-            // Si la URL ya tiene el prefijo jdbc:, no hacer nada
-            if (databaseUrl.startsWith("jdbc:")) {
-                System.out.println("✅ URL ya está en formato JDBC, no se requiere conversión");
-                return;
-            }
-            
+        String jdbcUrl;
+        String username = null;
+        String password = null;
+
+        // Si la URL ya tiene el prefijo jdbc:, usarla directamente
+        if (databaseUrl != null && databaseUrl.startsWith("jdbc:")) {
+            System.out.println("✅ URL ya está en formato JDBC");
+            jdbcUrl = databaseUrl;
+            username = System.getenv("SPRING_DATASOURCE_USERNAME");
+            password = System.getenv("SPRING_DATASOURCE_PASSWORD");
+        } else if (databaseUrl != null && !databaseUrl.isEmpty()) {
             try {
                 // Parsear la URL de Render (formato: postgresql://user:pass@host:port/db)
                 URI dbUri = new URI(databaseUrl);
 
-                String username = dbUri.getUserInfo().split(":")[0];
-                String password = dbUri.getUserInfo().split(":")[1];
+                username = dbUri.getUserInfo().split(":")[0];
+                password = dbUri.getUserInfo().split(":")[1];
                 String host = dbUri.getHost();
                 int port = dbUri.getPort();
                 String path = dbUri.getPath();
 
                 // Construir la URL JDBC
-                String jdbcUrl = String.format(
+                jdbcUrl = String.format(
                     "jdbc:postgresql://%s:%d%s?sslmode=require",
                     host, port, path
                 );
 
-                // Establecer las propiedades del sistema para Spring Boot
-                System.setProperty("spring.datasource.url", jdbcUrl);
-                System.setProperty("spring.datasource.username", username);
-                System.setProperty("spring.datasource.password", password);
-
-                System.out.println("✅ DATABASE_URL parseada exitosamente");
+                System.out.println("✅ DATABASE_URL convertida exitosamente");
                 System.out.println("   Host: " + host);
-                System.out.println("   Database: " + path.substring(1)); // Remove leading /
+                System.out.println("   Database: " + path.substring(1));
                 System.out.println("   Username: " + username);
 
-            } catch (URISyntaxException e) {
+            } catch (URISyntaxException | NullPointerException e) {
                 System.err.println("❌ Error parseando DATABASE_URL: " + e.getMessage());
-                // No hacemos nada, dejamos que Spring use las configuraciones del properties
+                throw new RuntimeException("No se pudo parsear la URL de la base de datos", e);
             }
         } else {
-            System.out.println("ℹ️  DATABASE_URL no encontrada, usando configuración manual del properties");
+            throw new RuntimeException("No se encontró configuración de base de datos");
         }
+
+        // Configurar HikariCP
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(jdbcUrl);
+        config.setUsername(username);
+        config.setPassword(password);
+        config.setDriverClassName("org.postgresql.Driver");
+        config.setMaximumPoolSize(5);
+        config.setMinimumIdle(2);
+        config.setConnectionTimeout(30000);
+
+        return new HikariDataSource(config);
     }
 }
 
