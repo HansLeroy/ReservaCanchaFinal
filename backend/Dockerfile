@@ -4,8 +4,8 @@ FROM eclipse-temurin:17-jdk-jammy
 # Set the working directory
 WORKDIR /app
 
-# Copy the entire backend directory (. porque dockerContext ya es ./backend)
-COPY . ./
+# Copy the entire backend directory
+COPY backend/ ./
 
 # Make mvnw executable (important for Linux)
 RUN chmod +x ./mvnw
