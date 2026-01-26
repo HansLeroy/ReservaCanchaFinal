@@ -14,7 +14,7 @@ services:
   - type: web
     name: reservacancha-final-backend
     env: docker # Specify Docker environment
-    dockerfilePath: ./backend/Dockerfile # Point to the Dockerfile
+    dockerfilePath: ./Dockerfile # Point to the Dockerfile in root
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
