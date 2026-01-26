@@ -20,11 +20,21 @@ public class DatabaseConfig {
 
     @PostConstruct
     public void initDatabaseUrl() {
+        // Render puede proporcionar la URL como DATABASE_URL o SPRING_DATASOURCE_URL
         String databaseUrl = System.getenv("DATABASE_URL");
+        if (databaseUrl == null || databaseUrl.isEmpty()) {
+            databaseUrl = System.getenv("SPRING_DATASOURCE_URL");
+        }
 
         if (databaseUrl != null && !databaseUrl.isEmpty()) {
+            // Si la URL ya tiene el prefijo jdbc:, no hacer nada
+            if (databaseUrl.startsWith("jdbc:")) {
+                System.out.println("✅ URL ya está en formato JDBC, no se requiere conversión");
+                return;
+            }
+            
             try {
-                // Parsear la URL de Render
+                // Parsear la URL de Render (formato: postgresql://user:pass@host:port/db)
                 URI dbUri = new URI(databaseUrl);
 
                 String username = dbUri.getUserInfo().split(":")[0];
