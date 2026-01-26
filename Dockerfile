@@ -4,14 +4,11 @@ FROM eclipse-temurin:17-jdk-jammy
 # Set the working directory
 WORKDIR /app
 
-# Copy the Maven wrapper files to build the application inside the container
-COPY backend/.mvn ./.mvn
-COPY backend/mvnw .
-COPY backend/mvnw.cmd .
-COPY backend/pom.xml .
+# Copy the entire backend directory
+COPY backend/ ./
 
-# Copy the source code
-COPY backend/src ./src
+# Make mvnw executable (important for Linux)
+RUN chmod +x ./mvnw
 
 # Build the application
 # Use the Maven wrapper to build the JAR
