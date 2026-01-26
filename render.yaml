@@ -1,7 +1,7 @@
 services:
   # Frontend (Static Site)
   - type: web
-    name: reservacancha-final-frontend
+    name: reservacancha-frontend
     env: static
     staticPublishPath: ./frontend/dist/reservacancha-frontend 
     # The build command needs to be run from the frontend directory
@@ -12,7 +12,7 @@ services:
         destination: /index.html
   # Backend (Web Service)
   - type: web
-    name: reservacancha-final-backend
+    name: reservacancha-backend
     env: docker # Specify Docker environment
     dockerfilePath: ./Dockerfile # Point to the Dockerfile in root
     envVars:
