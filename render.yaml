@@ -19,10 +19,10 @@ services:
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
-      - key: SPRING_DATASOURCE_URL
-        # Usar la URL interna de la base de datos existente
-        value: postgresql://reservacancha:JjpQXMjIRkwVwLEnrbep3T3YmhJrlAhA@dpg-d5qf88c9c44c73dltlag-a.ohio-postgres.render.com:5432/reservacancha
-      - key: SPRING_DATASOURCE_USERNAME
-        value: reservacancha
-      - key: SPRING_DATASOURCE_PASSWORD
-        value: JjpQXMjIRkwVwLEnrbep3T3YmhJrlAhA
+      - key: DATABASE_URL
+        # DatabaseConfig convierte automáticamente de postgresql:// a jdbc:postgresql://
+        # IMPORTANTE: Usar la INTERNAL Database URL de Render (sin .ohio-postgres.render.com)
+        value: postgresql://reservacancha:JjpQXMjIRkwVwLEnrbep3T3YmhJr1AhA@dpg-d5qf88c9c44c73d1tlag-a:5432/reservacancha
+      - key: FRONTEND_URL
+        # Actualizar con tu URL de frontend real
+        value: https://reservacancha-frontend.onrender.com
