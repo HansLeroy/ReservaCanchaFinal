@@ -13,26 +13,16 @@ services:
   # Backend (Web Service)
   - type: web
     name: reservacancha-backend
-    env: docker # Specify Docker environment
-    dockerfilePath: ./Dockerfile # Point to the Dockerfile in root
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
       - key: SPRING_DATASOURCE_URL
-        # This will be provided by Render's PostgreSQL addon
-        fromDatabase:
-          name: reservacancha-db
-          property: connectionString
+        # Usar la URL interna de la base de datos existente
+        value: postgresql://reservacancha:JjpQXMjIRkwVwLEnrbep3T3YmhJrlAhA@dpg-d5qf88c9c44c73dltlag-a.ohio-postgres.render.com:5432/reservacancha
       - key: SPRING_DATASOURCE_USERNAME
-        fromDatabase:
-          name: reservacancha-db
-          property: user
+        value: reservacancha
       - key: SPRING_DATASOURCE_PASSWORD
-        fromDatabase:
-          name: reservacancha-db
-          property: password
-databases:
-  - name: reservacancha-db
-    databaseName: reservacancha_db_prod # The name of the database inside postgres
-    user: admin_reservacancha
-    plan: free # 'starter' or other plans for production use
+        value: JjpQXMjIRkwVwLEnrbep3T3YmhJrlAhA
