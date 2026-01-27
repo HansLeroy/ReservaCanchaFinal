@@ -342,38 +342,38 @@
         <div class="form-row">
           <div class="form-group">
             <label for="horaInicio" class="form-label">Hora Inicio</label>
-            <input
-              type="time"
+            <select
               id="horaInicio"
               name="horaInicio"
               [(ngModel)]="horaInicio"
               (ngModelChange)="onHoraInicioChange()"
-              (blur)="validarHoraInicio()"
               class="form-input"
-              min="08:00"
-              max="23:00"
-              step="3600"
               required
             >
-            <small class="form-help">Horario: 08:00 a 23:00 (solo horas en punto)</small>
+              <option value="">Selecciona una hora</option>
+              <option *ngFor="let hora of horariosDisponibles" [value]="hora">
+                {{ hora }}
+              </option>
+            </select>
+            <small class="form-help">Horario disponible: 08:00 a 23:00</small>
           </div>
 
           <div class="form-group">
             <label for="horaFin" class="form-label">Hora Fin</label>
-            <input
-              type="time"
+            <select
               id="horaFin"
               name="horaFin"
               [(ngModel)]="horaFin"
               (ngModelChange)="calcularPrecio()"
-              (blur)="validarHoraFin()"
               class="form-input"
-              min="08:00"
-              max="23:00"
-              step="3600"
               required
             >
-            <small class="form-help">Horario: 08:00 a 23:00 (solo horas en punto)</small>
+              <option value="">Selecciona una hora</option>
+              <option *ngFor="let hora of horariosDisponibles" [value]="hora">
+                {{ hora }}
+              </option>
+            </select>
+            <small class="form-help">Horario disponible: 08:00 a 23:00</small>
           </div>
         </div>
       </div>
