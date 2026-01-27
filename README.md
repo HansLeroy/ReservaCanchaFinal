@@ -210,8 +210,8 @@ Promedio: 19 ms
 ### 1. Clonar el Repositorio
 
 ```bash
-git clone https://github.com/HansLeroy/ReservaCanchaFinal.git
-cd ReservaCanchaFinal
+git clone https://github.com/HansLeroy/reservas-canchas.git
+cd reservas-canchas
 ```
 
 ### 2. Configurar Base de Datos
