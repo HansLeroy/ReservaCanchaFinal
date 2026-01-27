@@ -2,6 +2,8 @@ package com.example.reservacancha.backend.controller;
 
 import com.example.reservacancha.backend.model.Usuario;
 import com.example.reservacancha.backend.repository.UsuarioRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,8 @@ import java.util.Optional;
 @CrossOrigin(origins = {"http://localhost:4200", "http://localhost:4500"})
 public class AuthController {
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     @Autowired
     private UsuarioRepository usuarioRepository;
 
@@ -23,6 +27,7 @@ public class AuthController {
     public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest request) {
         Map<String, Object> response = new HashMap<>();
 
+        long start = System.currentTimeMillis();
         try {
             // Validar que vengan los datos
             if (request.getEmail() == null || request.getEmail().isEmpty()) {
@@ -37,8 +42,11 @@ public class AuthController {
                 return ResponseEntity.badRequest().body(response);
             }
 
-            // Buscar usuario
+            // Buscar usuario (medición de tiempo para diagnostico)
+            long t1 = System.currentTimeMillis();
             Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(request.getEmail());
+            long t2 = System.currentTimeMillis();
+            logger.debug("Tiempo findByEmail: {} ms", (t2 - t1));
 
             if (!usuarioOpt.isPresent()) {
                 response.put("success", false);
@@ -47,17 +55,6 @@ public class AuthController {
             }
 
             Usuario usuario = usuarioOpt.get();
-
-            // DEBUG: Log para diagnosticar el problema del password
-            System.out.println("=== DEBUG LOGIN ===");
-            System.out.println("Email recibido: " + request.getEmail());
-            System.out.println("Password recibido: [" + request.getPassword() + "]");
-            System.out.println("Password en BD: [" + usuario.getPassword() + "]");
-            System.out.println("Password recibido length: " + request.getPassword().length());
-            System.out.println("Password en BD length: " + usuario.getPassword().length());
-            System.out.println("¿Son iguales? " + usuario.getPassword().equals(request.getPassword()));
-            System.out.println("¿Son iguales (trim)? " + usuario.getPassword().trim().equals(request.getPassword().trim()));
-            System.out.println("==================");
 
             // Verificar si está activo
             if (!usuario.getActivo()) {
@@ -70,7 +67,12 @@ public class AuthController {
             String passwordBD = usuario.getPassword() != null ? usuario.getPassword().trim() : "";
             String passwordRecibido = request.getPassword() != null ? request.getPassword().trim() : "";
 
-            if (!passwordBD.equals(passwordRecibido)) {
+            long t3 = System.currentTimeMillis();
+            boolean ok = passwordBD.equals(passwordRecibido);
+            long t4 = System.currentTimeMillis();
+            logger.debug("Tiempo comparacion password: {} ms", (t4 - t3));
+
+            if (!ok) {
                 response.put("success", false);
                 response.put("message", "Contraseña incorrecta");
                 response.put("debug", "Password en BD tiene " + passwordBD.length() + " caracteres, recibido tiene " + passwordRecibido.length());
@@ -90,9 +92,13 @@ public class AuthController {
 
             response.put("user", userData);
 
+            long end = System.currentTimeMillis();
+            logger.info("Login de '{}' completado en {} ms", request.getEmail(), (end - start));
+
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
+            logger.error("Error en login", e);
             response.put("success", false);
             response.put("message", "Error en el servidor: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);

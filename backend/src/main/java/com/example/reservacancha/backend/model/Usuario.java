@@ -6,7 +6,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Entity
-@Table(name = "usuario")
+@Table(name = "usuario", indexes = {
+        @Index(name = "idx_usuario_email", columnList = "email"),
+        @Index(name = "idx_usuario_rut", columnList = "rut")
+})
 public class Usuario {
 
     @Id
@@ -150,4 +153,3 @@ public class Usuario {
         this.activo = activo;
     }
 }
-
