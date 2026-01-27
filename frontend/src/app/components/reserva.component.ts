@@ -431,6 +431,9 @@ export class ReservaComponent implements OnInit {
 
   onHoraInicioChange(): void {
     if (this.horaInicio) {
+      // Validar y corregir la hora si está fuera de rango
+      this.validarHoraInicio();
+
       // Establecer hora fin automáticamente (1 hora después)
       const [hora, minuto] = this.horaInicio.split(':');
       const horaNum = parseInt(hora);
@@ -443,6 +446,64 @@ export class ReservaComponent implements OnInit {
 
       this.horaFin = `${String(horaFinNum).padStart(2, '0')}:${minuto}`;
       this.calcularPrecio();
+    }
+  }
+
+  validarHoraInicio(): void {
+    if (!this.horaInicio) return;
+
+    const [hora, minuto] = this.horaInicio.split(':').map(Number);
+
+    // Si la hora es menor a 8, forzar a 08:00
+    if (hora < 8) {
+      this.horaInicio = '08:00';
+      this.errorMessage = 'La hora de inicio debe ser desde las 08:00. Se ajustó automáticamente.';
+      setTimeout(() => this.errorMessage = '', 3000);
+    }
+
+    // Si la hora es mayor o igual a 23, forzar a 22:00 (para permitir reserva hasta las 23:00)
+    if (hora >= 23) {
+      this.horaInicio = '22:00';
+      this.errorMessage = 'La hora de inicio no puede ser después de las 22:00. Se ajustó automáticamente.';
+      setTimeout(() => this.errorMessage = '', 3000);
+    }
+
+    // Redondear minutos a 00
+    if (minuto !== 0) {
+      this.horaInicio = `${String(hora).padStart(2, '0')}:00`;
+    }
+  }
+
+  validarHoraFin(): void {
+    if (!this.horaFin) return;
+
+    const [hora, minuto] = this.horaFin.split(':').map(Number);
+
+    // Si la hora es menor a 8, forzar a 09:00
+    if (hora < 8) {
+      this.horaFin = '09:00';
+      this.errorMessage = 'La hora de fin debe ser desde las 09:00. Se ajustó automáticamente.';
+      setTimeout(() => this.errorMessage = '', 3000);
+    }
+
+    // Si la hora es mayor a 23, forzar a 23:00
+    if (hora > 23) {
+      this.horaFin = '23:00';
+      this.errorMessage = 'La hora de fin no puede ser después de las 23:00. Se ajustó automáticamente.';
+      setTimeout(() => this.errorMessage = '', 3000);
+    }
+
+    // Redondear minutos a 00
+    if (minuto !== 0) {
+      this.horaFin = `${String(hora).padStart(2, '0')}:00`;
+    }
+
+    // Validar que hora fin sea posterior a hora inicio
+    if (this.horaInicio && this.horaFin <= this.horaInicio) {
+      const [horaIni] = this.horaInicio.split(':').map(Number);
+      this.horaFin = `${String(horaIni + 1).padStart(2, '0')}:00`;
+      this.errorMessage = 'La hora de fin debe ser posterior a la hora de inicio. Se ajustó automáticamente.';
+      setTimeout(() => this.errorMessage = '', 3000);
     }
   }
 
@@ -519,9 +580,18 @@ export class ReservaComponent implements OnInit {
     const [horaFin] = this.horaFin.split(':').map(Number);
 
     if (horaIni < 8 || horaIni >= 23) {
-      this.errorMessage = 'La hora de inicio debe estar entre las 08:00 y las 23:00';
+      this.errorMessage = 'La hora de inicio debe estar entre las 08:00 y las 22:00';
       console.log('❌ Hora inicio fuera de rango');
+      // Corregir automáticamente
+      this.horaInicio = horaIni < 8 ? '08:00' : '22:00';
       return false;
+    }
+
+    if (horaFin < 8 || horaFin > 23) {
+      this.errorMessage = 'La hora de fin debe estar entre las 08:00 y las 23:00';
+      console.log('❌ Hora fin fuera de rango');
+      // Corregir automáticamente
+      this.horaFin = horaFin < 8 ? '09:00' : '23:00';
       return false;
     }
     console.log('✓ Horarios dentro del rango permitido');

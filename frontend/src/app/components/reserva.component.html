@@ -348,12 +348,14 @@
               name="horaInicio"
               [(ngModel)]="horaInicio"
               (ngModelChange)="onHoraInicioChange()"
+              (blur)="validarHoraInicio()"
               class="form-input"
               min="08:00"
               max="23:00"
+              step="3600"
               required
             >
-            <small class="form-help">Horario: 08:00 a 23:00</small>
+            <small class="form-help">Horario: 08:00 a 23:00 (solo horas en punto)</small>
           </div>
 
           <div class="form-group">
@@ -364,12 +366,14 @@
               name="horaFin"
               [(ngModel)]="horaFin"
               (ngModelChange)="calcularPrecio()"
+              (blur)="validarHoraFin()"
               class="form-input"
               min="08:00"
               max="23:00"
+              step="3600"
               required
             >
-            <small class="form-help">Horario: 08:00 a 23:00</small>
+            <small class="form-help">Horario: 08:00 a 23:00 (solo horas en punto)</small>
           </div>
         </div>
       </div>
