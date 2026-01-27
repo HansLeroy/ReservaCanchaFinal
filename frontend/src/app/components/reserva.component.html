@@ -349,8 +349,11 @@
               [(ngModel)]="horaInicio"
               (ngModelChange)="onHoraInicioChange()"
               class="form-input"
+              min="08:00"
+              max="23:00"
               required
             >
+            <small class="form-help">Horario: 08:00 a 23:00</small>
           </div>
 
           <div class="form-group">
@@ -362,8 +365,11 @@
               [(ngModel)]="horaFin"
               (ngModelChange)="calcularPrecio()"
               class="form-input"
+              min="08:00"
+              max="23:00"
               required
             >
+            <small class="form-help">Horario: 08:00 a 23:00</small>
           </div>
         </div>
       </div>
