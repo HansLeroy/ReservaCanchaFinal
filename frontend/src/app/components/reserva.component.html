@@ -499,7 +499,7 @@
     <h2>¡Reserva Confirmada!</h2>
     <p class="success-message">{{ successMessage }}</p>
 
-    <div class="resumen-reserva">
+    <div id="comprobante-reserva" class="resumen-reserva">
       <h3>Resumen de tu Reserva</h3>
       <div class="resumen-item">
         <span class="resumen-label">Cliente:</span>
@@ -539,9 +539,10 @@
       </div>
     </div>
 
-    <button class="btn-primary" (click)="nuevaReserva()">
-      Nueva Reserva
-    </button>
+    <div class="resumen-acciones">
+      <button class="btn-secondary" (click)="imprimirComprobante()" type="button">Imprimir Comprobante</button>
+      <button class="btn-primary" (click)="nuevaReserva()">Nueva Reserva</button>
+    </div>
   </div>
 </div>
 

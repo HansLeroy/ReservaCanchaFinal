@@ -859,5 +859,47 @@ export class ReservaComponent implements OnInit {
   obtenerCanchasDisponibles(): number {
     return this.canchasDisponiblesAhora.filter(c => c.disponibleAhora).length;
   }
+
+  imprimirComprobante(): void {
+    try {
+      const contenido = document.getElementById('comprobante-reserva')?.innerHTML || '';
+      const ventana = window.open('', '_blank', 'width=900,height=700');
+      if (!ventana) {
+        this.errorMessage = 'No se pudo abrir la ventana de impresión. Verifica el bloqueador de ventanas.';
+        return;
+      }
+
+      const estilos = `
+        <style>
+          body { font-family: Arial, Helvetica, sans-serif; color: #111; padding: 20px; }
+          h3 { margin-top: 0; }
+          .resumen-item { margin: 6px 0; }
+          .resumen-label { font-weight: 600; display: inline-block; width: 120px; }
+          .total { font-size: 1.1em; font-weight: 700; margin-top: 12px; }
+        </style>`;
+
+      ventana.document.open();
+      ventana.document.write('<html><head><title>Comprobante de Reserva</title>' + estilos + '</head><body>');
+
+      // Cabecera
+      ventana.document.write('<h2>Comprobante de Reserva</h2>');
+
+      // Contenido principal (usar el HTML del resumen si existe)
+      ventana.document.write(contenido);
+
+      ventana.document.write('</body></html>');
+      ventana.document.close();
+      ventana.focus();
+      // Esperar un pequeño retardo para que cargue estilos y DOM
+      setTimeout(() => {
+        ventana.print();
+        // No cerrar automáticamente para que el usuario pueda revisar
+        // ventana.close();
+      }, 200);
+    } catch (err) {
+      console.error('Error al intentar imprimir:', err);
+      this.errorMessage = 'Ocurrió un error al preparar el comprobante para impresión.';
+    }
+  }
 }
 
