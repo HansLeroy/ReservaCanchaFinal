@@ -38,44 +38,50 @@ public class ClienteService {
     }
 
     public Cliente crearCliente(Cliente cliente) {
-        // Validar formato de RUT
+        return clienteRepository.findById(normalizarRut(rut));
         if (!validarRut(cliente.getRut())) {
             throw new IllegalArgumentException("RUT inválido");
         }
-        // Validar que no exista el RUT
+        return clienteRepository.findByRut(normalizarRut(rut));
         if (clienteRepository.existsByRut(cliente.getRut())) {
             throw new IllegalArgumentException("Ya existe un cliente con ese RUT");
         }
-
-        // Validar que no exista el email
-        if (clienteRepository.existsByEmail(cliente.getEmail())) {
-            throw new IllegalArgumentException("Ya existe un cliente con ese email");
+        // Normalizar y validar RUT
+        String rutNormal = normalizarRut(cliente.getRut());
+        if (!validarRut(rutNormal)) {
+            throw new IllegalArgumentException("RUT inválido");
         }
+        cliente.setRut(rutNormal);
 
-        return clienteRepository.save(cliente);
-    }
+        // Validar que no exista el RUT
+        if (clienteRepository.existsByRut(rutNormal)) {
+            throw new IllegalArgumentException("Ya existe un cliente con ese RUT");
+        }
 
     public Cliente actualizarCliente(String rut, Cliente cliente) {
         Optional<Cliente> existente = clienteRepository.findById(rut);
-        if (existente.isEmpty()) {
+        String rutNormal = normalizarRut(rut);
+        Optional<Cliente> existente = clienteRepository.findById(rutNormal);
             return null;
         }
 
         cliente.setId(rut);
-        return clienteRepository.save(cliente);
+        cliente.setId(rutNormal);
     }
 
     public boolean eliminarCliente(String rut) {
         if (clienteRepository.existsById(rut)) {
-            clienteRepository.deleteById(rut);
-            return true;
+        String rutNormal = normalizarRut(rut);
+        if (clienteRepository.existsById(rutNormal)) {
+            clienteRepository.deleteById(rutNormal);
         }
         return false;
     }
 
     public Cliente activarCliente(String rut) {
         Optional<Cliente> cliente = clienteRepository.findById(rut);
-        if (cliente.isPresent()) {
+        String rutNormal = normalizarRut(rut);
+        Optional<Cliente> cliente = clienteRepository.findById(rutNormal);
             cliente.get().setActivo(true);
             return clienteRepository.save(cliente.get());
         }
@@ -84,7 +90,8 @@ public class ClienteService {
 
     public Cliente desactivarCliente(String rut) {
         Optional<Cliente> cliente = clienteRepository.findById(rut);
-        if (cliente.isPresent()) {
+        String rutNormal = normalizarRut(rut);
+        Optional<Cliente> cliente = clienteRepository.findById(rutNormal);
             cliente.get().setActivo(false);
             return clienteRepository.save(cliente.get());
         }
@@ -93,7 +100,7 @@ public class ClienteService {
 
     public void registrarReserva(String clienteRut, Double monto) {
         Optional<Cliente> cliente = clienteRepository.findById(clienteRut);
-        if (cliente.isPresent()) {
+        Optional<Cliente> cliente = clienteRepository.findById(normalizarRut(clienteRut));
             cliente.get().incrementarReservas();
             cliente.get().agregarGasto(monto);
             clienteRepository.save(cliente.get());
@@ -103,13 +110,14 @@ public class ClienteService {
     public Cliente obtenerOCrearCliente(String nombre, String apellido, String rut,
                                        String email, String telefono) {
         // Normalizar y validar RUT
-        if (!validarRut(rut)) {
+        // Normalizar y validar RUT
+        String rutNormal = normalizarRut(rut);
+        if (!validarRut(rutNormal)) {
             throw new IllegalArgumentException("RUT inválido");
         }
-
         // Buscar si ya existe el cliente por RUT
         Optional<Cliente> existente = clienteRepository.findByRut(rut);
-
+        Optional<Cliente> existente = clienteRepository.findByRut(rutNormal);
         if (existente.isPresent()) {
             // Actualizar datos si es necesario
             Cliente cliente = existente.get();
@@ -121,10 +129,10 @@ public class ClienteService {
         } else {
             // Crear nuevo cliente
             Cliente nuevoCliente = new Cliente();
+            Cliente nuevoCliente = new Cliente();
             nuevoCliente.setNombre(nombre);
             nuevoCliente.setApellido(apellido);
-            nuevoCliente.setRut(rut);
-            nuevoCliente.setEmail(email);
+            nuevoCliente.setRut(rutNormal);
             nuevoCliente.setTelefono(telefono);
             return clienteRepository.save(nuevoCliente);
         }
@@ -154,4 +162,13 @@ public class ClienteService {
         return dvCalc == dv;
     }
 }
+
+    private String normalizarRut(String rut) {
+        if (rut == null) return null;
+        String clean = rut.replace(".", "").replace("-", "").toUpperCase();
+        if (clean.length() < 2) return rut;
+        String body = clean.substring(0, clean.length() - 1);
+        String dv = clean.substring(clean.length() - 1);
+        return body + "-" + dv;
+    }
 
