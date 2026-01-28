@@ -39,6 +39,7 @@ export class ReservaComponent implements OnInit {
   buscandoCliente: boolean = false;
   clienteEncontrado: boolean = false;
   mensajeBusqueda: string = '';
+  mensajeRutInvalido: boolean = false;
   reservasHoy: any[] = [];
   mostrarAlertaReservas: boolean = false;
 
@@ -316,11 +317,22 @@ export class ReservaComponent implements OnInit {
     // Limpiar mensajes previos
     this.mensajeBusqueda = '';
     this.clienteEncontrado = false;
+    this.mensajeRutInvalido = false;
+
+    // Si aún no tiene longitud mínima, no validar
+    if (this.rutCliente.length < 9) {
+      return;
+    }
 
     // Validar formato básico de RUT
-    if (this.rutCliente.length >= 9 && this.validarRut(this.rutCliente)) {
-      this.buscarClientePorRut();
+    if (!this.validarRut(this.rutCliente)) {
+      this.mensajeRutInvalido = true;
+      this.mensajeBusqueda = 'Por favor ingresa un RUT válido (ej: 12345678-9)';
+      return;
     }
+
+    // Si es válido, buscar cliente
+    this.buscarClientePorRut();
   }
 
   buscarClientePorRut(): void {

@@ -50,6 +50,7 @@
             class="form-input form-input-big"
             [class.input-loading]="buscandoCliente"
             [class.input-success]="clienteEncontrado"
+            [class.input-error]="mensajeRutInvalido"
             placeholder="Ej: 12345678-9"
             required
             autofocus
@@ -59,7 +60,9 @@
           <!-- Mensaje de búsqueda -->
           <div class="busqueda-message" *ngIf="mensajeBusqueda">
             <span class="spinner-small" *ngIf="buscandoCliente"></span>
-            <span [class.text-success]="clienteEncontrado" [class.text-info]="!clienteEncontrado && !buscandoCliente">
+            <span [class.text-success]="clienteEncontrado"
+                  [class.text-info]="!clienteEncontrado && !buscandoCliente && !mensajeRutInvalido"
+                  [class.text-danger]="mensajeRutInvalido">
               {{ mensajeBusqueda }}
             </span>
           </div>
