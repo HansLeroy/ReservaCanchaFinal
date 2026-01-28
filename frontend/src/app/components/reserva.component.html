@@ -232,6 +232,15 @@
           </div>
         </div>
 
+        <div class="error-message" *ngIf="conflictMessage" style="margin-top:8px;">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:18px;vertical-align:middle;">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2"/>
+            <line x1="12" y1="16" x2="12.01" y2="16" stroke="currentColor" stroke-width="2"/>
+          </svg>
+          {{ conflictMessage }}
+        </div>
+
         <div class="form-row">
           <div class="form-group">
             <label for="email" class="form-label">Email</label>

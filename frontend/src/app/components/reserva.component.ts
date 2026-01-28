@@ -33,6 +33,8 @@ export class ReservaComponent implements OnInit {
   mostrarFormulario: boolean = true;
   errorMessage: string = '';
   successMessage: string = '';
+  conflictMessage: string = '';
+  conflictReserva: any = null;
   isLoading: boolean = false;
   buscandoCliente: boolean = false;
   clienteEncontrado: boolean = false;
@@ -288,6 +290,15 @@ export class ReservaComponent implements OnInit {
       this.canchaSeleccionada = this.canchas.find(c => c.id === id) || null;
       console.log('✅ Cancha encontrada:', this.canchaSeleccionada);
       this.calcularPrecio();
+      // Re-evaluar conflicto al cambiar de cancha
+      if (this.horaInicio && this.horaFin) {
+        const fechaHoraInicio = `${this.fechaReserva}T${this.horaInicio}:00`;
+        const fechaHoraFin = `${this.fechaReserva}T${this.horaFin}:00`;
+        this.buscarReservaConflictiva(Number(canchaId), fechaHoraInicio, fechaHoraFin);
+      } else {
+        this.conflictMessage = '';
+        this.conflictReserva = null;
+      }
     } else {
       this.canchaSeleccionada = null;
       this.precioTotal = 0;
@@ -462,6 +473,12 @@ export class ReservaComponent implements OnInit {
 
       this.horaFin = `${String(horaFinNum).padStart(2, '0')}:${minuto}`;
       this.calcularPrecio();
+        // Verificar conflicto con otras reservas si hay cancha seleccionada
+        if (this.canchaSeleccionada) {
+          const fechaHoraInicio = `${this.fechaReserva}T${this.horaInicio}:00`;
+          const fechaHoraFin = `${this.fechaReserva}T${this.horaFin}:00`;
+          this.buscarReservaConflictiva(Number(this.canchaSeleccionada.id), fechaHoraInicio, fechaHoraFin);
+        }
     }
   }
   
@@ -531,6 +548,11 @@ export class ReservaComponent implements OnInit {
       this.horaFin = `${hh}:${mm}`;
       this.errorMessage = 'La hora de fin debe ser posterior a la hora de inicio. Se ajustó automáticamente.';
       setTimeout(() => this.errorMessage = '', 3000);
+      if (this.canchaSeleccionada) {
+        const fechaHoraInicio = `${this.fechaReserva}T${this.horaInicio}:00`;
+        const fechaHoraFin = `${this.fechaReserva}T${this.horaFin}:00`;
+        this.buscarReservaConflictiva(Number(this.canchaSeleccionada.id), fechaHoraInicio, fechaHoraFin);
+      }
     }
   }
 
@@ -679,17 +701,18 @@ export class ReservaComponent implements OnInit {
         const newStart = new Date(fechaHoraInicio).getTime();
         const newEnd = new Date(fechaHoraFin).getTime();
 
-        const overlap = reservas.some(r => {
-          // Considerar tanto CONFIRMADA como PENDIENTE_PAGO como bloqueantes
+        const conflicto = reservas.find(r => {
           if (!(r.estado === 'CONFIRMADA' || r.estado === 'PENDIENTE_PAGO')) return false;
           const existingStart = new Date(r.fechaHoraInicio).getTime();
           const existingEnd = new Date(r.fechaHoraFin).getTime();
           return newStart < existingEnd && newEnd > existingStart;
         });
 
-        if (overlap) {
+        if (conflicto) {
           this.isLoading = false;
-          this.errorMessage = 'La cancha no está disponible en ese horario (solapamiento detectado).';
+          const inicio = this.formatearHora(conflicto.fechaHoraInicio);
+          const fin = this.formatearHora(conflicto.fechaHoraFin);
+          this.errorMessage = `La cancha ya tiene una reserva desde ${inicio} hasta ${fin}`;
           return;
         }
 
@@ -858,6 +881,40 @@ export class ReservaComponent implements OnInit {
 
   obtenerCanchasDisponibles(): number {
     return this.canchasDisponiblesAhora.filter(c => c.disponibleAhora).length;
+  }
+
+  buscarReservaConflictiva(canchaId: number, fechaHoraInicio: string, fechaHoraFin: string): void {
+    this.conflictMessage = '';
+    this.conflictReserva = null;
+
+    this.reservaService.getReservasPorCancha(canchaId).subscribe({
+      next: (reservas) => {
+        const newStart = new Date(fechaHoraInicio).getTime();
+        const newEnd = new Date(fechaHoraFin).getTime();
+
+        const conflicto = reservas.find(r => {
+          if (!(r.estado === 'CONFIRMADA' || r.estado === 'PENDIENTE_PAGO')) return false;
+          const existingStart = new Date(r.fechaHoraInicio).getTime();
+          const existingEnd = new Date(r.fechaHoraFin).getTime();
+          return newStart < existingEnd && newEnd > existingStart;
+        });
+
+        if (conflicto) {
+          this.conflictReserva = conflicto;
+          const inicio = this.formatearHora(conflicto.fechaHoraInicio);
+          const fin = this.formatearHora(conflicto.fechaHoraFin);
+          this.conflictMessage = `La cancha ya tiene una reserva desde ${inicio} hasta ${fin}`;
+        } else {
+          this.conflictMessage = '';
+          this.conflictReserva = null;
+        }
+      },
+      error: (err) => {
+        console.error('Error al buscar reservas por cancha para conflicto:', err);
+        this.conflictMessage = '';
+        this.conflictReserva = null;
+      }
+    });
   }
 
   imprimirComprobante(): void {
