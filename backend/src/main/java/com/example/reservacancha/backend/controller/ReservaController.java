@@ -77,6 +77,14 @@ public class ReservaController {
             }
             System.out.println("✗ El servicio retornó null - Cancha no encontrada");
             return ResponseEntity.badRequest().body("La cancha seleccionada no existe");
+        } catch (com.example.reservacancha.backend.exception.OverlapException oe) {
+            System.out.println("✗ OVERLAP: " + oe.getMessage());
+            Map<String, Object> resp = new HashMap<>();
+            resp.put("message", oe.getMessage());
+            resp.put("conflictReservaId", oe.getConflictReservaId());
+            resp.put("conflictFechaInicio", oe.getConflictFechaInicio());
+            resp.put("conflictFechaFin", oe.getConflictFechaFin());
+            return ResponseEntity.badRequest().body(resp);
         } catch (Exception e) {
             System.out.println("✗ ERROR AL CREAR RESERVA: " + e.getMessage());
             e.printStackTrace();
@@ -126,6 +134,14 @@ public class ReservaController {
             }
             System.out.println("✗ El servicio retornó null - Cancha no encontrada");
             return ResponseEntity.badRequest().body("La cancha seleccionada no existe");
+        } catch (com.example.reservacancha.backend.exception.OverlapException oe) {
+            System.out.println("✗ OVERLAP (telefonica): " + oe.getMessage());
+            Map<String, Object> resp = new HashMap<>();
+            resp.put("message", oe.getMessage());
+            resp.put("conflictReservaId", oe.getConflictReservaId());
+            resp.put("conflictFechaInicio", oe.getConflictFechaInicio());
+            resp.put("conflictFechaFin", oe.getConflictFechaFin());
+            return ResponseEntity.badRequest().body(resp);
         } catch (Exception e) {
             System.out.println("✗ ERROR AL CREAR RESERVA TELEFÓNICA: " + e.getMessage());
             e.printStackTrace();

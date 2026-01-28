@@ -195,6 +195,8 @@ public class ReservaService {
     private void verificarSolapamiento(Reserva nuevaReserva) {
         List<Reserva> reservasExistentes = reservaRepository.findByCanchaId(nuevaReserva.getCanchaId());
 
+        java.time.format.DateTimeFormatter timeFmt = java.time.format.DateTimeFormatter.ofPattern("HH:mm");
+
         for (Reserva r : reservasExistentes) {
             if (!("CONFIRMADA".equals(r.getEstado()) || "PENDIENTE_PAGO".equals(r.getEstado()))) {
                 continue;
@@ -203,10 +205,14 @@ public class ReservaService {
             // Si hay intersección entre [inicio, fin) de las reservas
             if (nuevaReserva.getFechaHoraInicio().isBefore(r.getFechaHoraFin()) &&
                 nuevaReserva.getFechaHoraFin().isAfter(r.getFechaHoraInicio())) {
-                String msg = String.format("Solapamiento con reserva existente (id=%d) desde %s hasta %s",
-                        r.getId(), r.getFechaHoraInicio().toString(), r.getFechaHoraFin().toString());
+                // Preparar datos estructurados para respuesta
+                String inicioIso = r.getFechaHoraInicio().toString();
+                String finIso = r.getFechaHoraFin().toString();
+                String inicio = r.getFechaHoraInicio().toLocalTime().format(timeFmt);
+                String fin = r.getFechaHoraFin().toLocalTime().format(timeFmt);
+                String msg = String.format("La cancha ya tiene una reserva desde %s hasta %s", inicio, fin);
                 System.out.println("✗ " + msg);
-                throw new IllegalArgumentException(msg);
+                throw new com.example.reservacancha.backend.exception.OverlapException(r.getId(), inicioIso, finIso, msg);
             }
         }
     }

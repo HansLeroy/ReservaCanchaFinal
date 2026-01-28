@@ -788,6 +788,16 @@ export class ReservaComponent implements OnInit {
 
         if (error.status === 0) {
           this.errorMessage = 'No se puede conectar con el servidor. Verifica que el backend esté corriendo.';
+        } else if (error.error?.conflictFechaInicio) {
+          try {
+            const inicio = new Date(error.error.conflictFechaInicio);
+            const fin = new Date(error.error.conflictFechaFin);
+            const inicioStr = inicio.toLocaleString('es-CL', { dateStyle: 'short', hour: '2-digit', minute: '2-digit' });
+            const finStr = fin.toLocaleString('es-CL', { dateStyle: 'short', hour: '2-digit', minute: '2-digit' });
+            this.errorMessage = `La cancha ya tiene una reserva (id=${error.error?.conflictReservaId}) desde ${inicioStr} hasta ${finStr}`;
+          } catch (e) {
+            this.errorMessage = error.error?.message || 'Error al crear la reserva. Intenta nuevamente.';
+          }
         } else {
           this.errorMessage = error.error?.message || 'Error al crear la reserva. Intenta nuevamente.';
         }
@@ -863,6 +873,16 @@ export class ReservaComponent implements OnInit {
 
         if (error.status === 0) {
           this.errorMessage = 'No se puede conectar con el servidor. Verifica que el backend esté corriendo.';
+        } else if (error.error?.conflictFechaInicio) {
+          try {
+            const inicio = new Date(error.error.conflictFechaInicio);
+            const fin = new Date(error.error.conflictFechaFin);
+            const inicioStr = inicio.toLocaleString('es-CL', { dateStyle: 'short', hour: '2-digit', minute: '2-digit' });
+            const finStr = fin.toLocaleString('es-CL', { dateStyle: 'short', hour: '2-digit', minute: '2-digit' });
+            this.errorMessage = `La cancha ya tiene una reserva (id=${error.error?.conflictReservaId}) desde ${inicioStr} hasta ${finStr}`;
+          } catch (e) {
+            this.errorMessage = error.error?.message || 'Error al crear la reserva. Intenta nuevamente.';
+          }
         } else {
           this.errorMessage = error.error?.message || 'Error al crear la reserva. Intenta nuevamente.';
         }
