@@ -673,8 +673,21 @@ export class ReservaComponent implements OnInit {
   }
 
   validarRut(rut: string): boolean {
-    const rutRegex = /^\d{7,8}-[\dkK]$/;
-    return rutRegex.test(rut);
+    if (!rut) return false;
+    const clean = rut.replace(/\./g, '').replace(/-/g, '').toUpperCase();
+    if (!/^\d{7,8}[0-9K]$/.test(clean)) return false;
+
+    const body = clean.slice(0, -1);
+    const dv = clean.slice(-1);
+    let sum = 0;
+    let mul = 2;
+    for (let i = body.length - 1; i >= 0; i--) {
+      sum += Number(body.charAt(i)) * mul;
+      mul = (mul === 7) ? 2 : mul + 1;
+    }
+    const res = 11 - (sum % 11);
+    const dvCalc = res === 11 ? '0' : res === 10 ? 'K' : String(res);
+    return dvCalc === dv;
   }
 
   onSubmit(): void {

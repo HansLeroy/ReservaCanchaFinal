@@ -38,6 +38,10 @@ public class ClienteService {
     }
 
     public Cliente crearCliente(Cliente cliente) {
+        // Validar formato de RUT
+        if (!validarRut(cliente.getRut())) {
+            throw new IllegalArgumentException("RUT inválido");
+        }
         // Validar que no exista el RUT
         if (clienteRepository.existsByRut(cliente.getRut())) {
             throw new IllegalArgumentException("Ya existe un cliente con ese RUT");
@@ -98,6 +102,11 @@ public class ClienteService {
 
     public Cliente obtenerOCrearCliente(String nombre, String apellido, String rut,
                                        String email, String telefono) {
+        // Normalizar y validar RUT
+        if (!validarRut(rut)) {
+            throw new IllegalArgumentException("RUT inválido");
+        }
+
         // Buscar si ya existe el cliente por RUT
         Optional<Cliente> existente = clienteRepository.findByRut(rut);
 
@@ -119,6 +128,30 @@ public class ClienteService {
             nuevoCliente.setTelefono(telefono);
             return clienteRepository.save(nuevoCliente);
         }
+    }
+
+    /**
+     * Valida un RUT chileno usando módulo 11.
+     */
+    private boolean validarRut(String rut) {
+        if (rut == null) return false;
+        String clean = rut.replace(".", "").replace("-", "").toUpperCase();
+        if (!clean.matches("\\\d{7,8}[0-9K]")) return false;
+
+        String body = clean.substring(0, clean.length() - 1);
+        char dv = clean.charAt(clean.length() - 1);
+        int sum = 0;
+        int mul = 2;
+        for (int i = body.length() - 1; i >= 0; i--) {
+            sum += Character.getNumericValue(body.charAt(i)) * mul;
+            mul = (mul == 7) ? 2 : mul + 1;
+        }
+        int res = 11 - (sum % 11);
+        char dvCalc;
+        if (res == 11) dvCalc = '0';
+        else if (res == 10) dvCalc = 'K';
+        else dvCalc = Character.forDigit(res, 10);
+        return dvCalc == dv;
     }
 }
 
