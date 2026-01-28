@@ -26,8 +26,6 @@ export class ReservaComponent implements OnInit {
   fechaReserva: string = '';
   horaInicio: string = '';
   horaFin: string = '';
-  // Duración en minutos (por defecto 60 minutos)
-  duracionMinutos: number = 60;
   precioTotal: number = 0;
   tipoPago: string = '';
 
@@ -225,8 +223,16 @@ export class ReservaComponent implements OnInit {
       } else {
         this.horaInicio = horaInicio.toTimeString().slice(0, 5);
 
-        // Calcular horaFin usando la duración seleccionada (soporta minutos)
-        this.calcularHoraFinDesdeInicioYDuracion();
+        // Hora fin: 1 hora después
+        const horaFinDate = new Date(horaInicio.getTime() + 60 * 60 * 1000);
+
+        // Si la hora fin pasa de las 23:00, ajustar a 23:00
+        if (horaFinDate.getHours() >= 23) {
+          this.horaFin = '23:00';
+          console.log('⏰ Hora fin ajustada a 23:00 (límite del día)');
+        } else {
+          this.horaFin = horaFinDate.toTimeString().slice(0, 5);
+        }
       }
     }
 
@@ -444,43 +450,21 @@ export class ReservaComponent implements OnInit {
       // Validar y corregir la hora si está fuera de rango
       this.validarHoraInicio();
 
-      // Establecer hora fin automáticamente (1 hora después) usando los slots disponibles
-      // Recalcular horaFin usando la duración actual
-      this.calcularHoraFinDesdeInicioYDuracion();
+      // Establecer hora fin automáticamente (1 hora después)
+      const [hora, minuto] = this.horaInicio.split(':');
+      const horaNum = parseInt(hora);
+      let horaFinNum = horaNum + 1;
+
+      // Asegurar que la hora fin no exceda las 23:00
+      if (horaFinNum > 23) {
+        horaFinNum = 23;
+      }
+
+      this.horaFin = `${String(horaFinNum).padStart(2, '0')}:${minuto}`;
       this.calcularPrecio();
     }
   }
-
-  onDuracionChange(): void {
-    // Al cambiar la duración en minutos, recalcular hora fin y precio
-    this.calcularHoraFinDesdeInicioYDuracion();
-    this.calcularPrecio();
-  }
-
-  calcularHoraFinDesdeInicioYDuracion(): void {
-    if (!this.horaInicio) return;
-    if (!this.horariosDisponibles || this.horariosDisponibles.length === 0) {
-      // Fallback simple: sumar minutos a la hora inicio
-      const [h, m] = this.horaInicio.split(':').map(Number);
-      const fecha = new Date();
-      fecha.setHours(h, m + this.duracionMinutos, 0, 0);
-      const hh = String(fecha.getHours()).padStart(2, '0');
-      const mm = String(fecha.getMinutes()).padStart(2, '0');
-      this.horaFin = `${hh}:${mm}`;
-      return;
-    }
-
-    // Encontrar índice del slot de inicio (o el primer slot >= horaInicio)
-    let idx = this.horariosDisponibles.indexOf(this.horaInicio);
-    if (idx < 0) {
-      idx = this.horariosDisponibles.findIndex(s => s >= this.horaInicio);
-      if (idx < 0) idx = this.horariosDisponibles.length - 1;
-    }
-
-    const pasos = Math.round(this.duracionMinutos / 15);
-    const idxFin = Math.min(this.horariosDisponibles.length - 1, idx + pasos);
-    this.horaFin = this.horariosDisponibles[idxFin];
-  }
+  
 
   validarHoraInicio(): void {
     if (!this.horaInicio) return;
