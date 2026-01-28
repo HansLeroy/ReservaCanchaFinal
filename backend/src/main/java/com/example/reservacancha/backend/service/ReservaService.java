@@ -76,8 +76,12 @@ public class ReservaService {
                 reserva.setEstado("CONFIRMADA");
                 System.out.println("✓ Monto calculado: " + montoTotal + " (" + horas + " horas)");
 
+                // Verificar solapamientos con reservas existentes (CONFIRMADA o PENDIENTE_PAGO)
+                System.out.println("Paso 3: Verificando solapamientos con reservas existentes...");
+                verificarSolapamiento(reserva);
+
                 // Guardar reserva
-                System.out.println("Paso 3: Guardando reserva en BD...");
+                System.out.println("Paso 4: Guardando reserva en BD...");
                 Reserva reservaGuardada = reservaRepository.save(reserva);
                 System.out.println("✓ Reserva guardada con ID: " + reservaGuardada.getId());
 
@@ -161,8 +165,12 @@ public class ReservaService {
                 System.out.println("✓ Monto calculado: " + montoTotal + " (" + horas + " horas)");
                 System.out.println("📞 Estado: PENDIENTE_PAGO (Reserva telefónica)");
 
+                // Verificar solapamientos con reservas existentes (CONFIRMADA o PENDIENTE_PAGO)
+                System.out.println("Paso 3: Verificando solapamientos con reservas existentes (telefonica)...");
+                verificarSolapamiento(reserva);
+
                 // Guardar reserva
-                System.out.println("Paso 3: Guardando reserva telefónica en BD...");
+                System.out.println("Paso 4: Guardando reserva telefónica en BD...");
                 Reserva reservaGuardada = reservaRepository.save(reserva);
                 System.out.println("✓ Reserva telefónica guardada con ID: " + reservaGuardada.getId());
                 System.out.println("💡 El cliente debe hacer check-in y pagar cuando llegue");
@@ -176,6 +184,30 @@ public class ReservaService {
             System.out.println("✗ EXCEPCIÓN en crearReservaTelefonica: " + e.getMessage());
             e.printStackTrace();
             throw e;
+        }
+    }
+
+    /**
+     * Verifica si la reserva solicitada se solapa con reservas existentes para la misma cancha.
+     * Considera como bloqueantes los estados: CONFIRMADA y PENDIENTE_PAGO.
+     * Lanza IllegalArgumentException con mensaje claro si existe solapamiento.
+     */
+    private void verificarSolapamiento(Reserva nuevaReserva) {
+        List<Reserva> reservasExistentes = reservaRepository.findByCanchaId(nuevaReserva.getCanchaId());
+
+        for (Reserva r : reservasExistentes) {
+            if (!("CONFIRMADA".equals(r.getEstado()) || "PENDIENTE_PAGO".equals(r.getEstado()))) {
+                continue;
+            }
+
+            // Si hay intersección entre [inicio, fin) de las reservas
+            if (nuevaReserva.getFechaHoraInicio().isBefore(r.getFechaHoraFin()) &&
+                nuevaReserva.getFechaHoraFin().isAfter(r.getFechaHoraInicio())) {
+                String msg = String.format("Solapamiento con reserva existente (id=%d) desde %s hasta %s",
+                        r.getId(), r.getFechaHoraInicio().toString(), r.getFechaHoraFin().toString());
+                System.out.println("✗ " + msg);
+                throw new IllegalArgumentException(msg);
+            }
         }
     }
 
