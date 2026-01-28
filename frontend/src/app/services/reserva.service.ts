@@ -36,6 +36,10 @@ export class ReservaService {
     return this.http.get<Reserva[]>(`${this.apiUrl}/cliente/rut/${rut}`);
   }
 
+  getReservasPorCancha(canchaId: number): Observable<Reserva[]> {
+    return this.http.get<Reserva[]>(`${this.apiUrl}/cancha/${canchaId}`);
+  }
+
   cancelarReserva(id: number): Observable<void> {
     return this.http.patch<void>(`${this.apiUrl}/${id}/cancelar`, {});
   }

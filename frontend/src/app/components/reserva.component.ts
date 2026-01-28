@@ -121,10 +121,10 @@ export class ReservaComponent implements OnInit {
         const ahora = new Date();
         const fechaHoy = ahora.toISOString().split('T')[0];
 
-        // Filtrar reservas de hoy
+        // Filtrar reservas de hoy (considerar confirmadas y pendientes de pago)
         const reservasHoy = reservas.filter(r => {
           const fechaReserva = r.fechaHoraInicio.split('T')[0];
-          return fechaReserva === fechaHoy && r.estado === 'CONFIRMADA';
+          return fechaReserva === fechaHoy && (r.estado === 'CONFIRMADA' || r.estado === 'PENDIENTE_PAGO');
         });
 
         console.log(`Reservas de hoy: ${reservasHoy.length}`);
@@ -354,10 +354,10 @@ export class ReservaComponent implements OnInit {
       next: (reservas) => {
         const ahora = new Date();
 
-        // Filtrar solo las reservas futuras que estén confirmadas
+        // Filtrar las reservas futuras que estén confirmadas o pendientes de pago
         this.reservasHoy = reservas.filter(r => {
           const fechaReserva = new Date(r.fechaHoraInicio);
-          return fechaReserva >= ahora && r.estado === 'CONFIRMADA';
+          return fechaReserva >= ahora && (r.estado === 'CONFIRMADA' || r.estado === 'PENDIENTE_PAGO');
         }).sort((a, b) => {
           // Ordenar por fecha más cercana primero
           return new Date(a.fechaHoraInicio).getTime() - new Date(b.fechaHoraInicio).getTime();
@@ -673,6 +673,38 @@ export class ReservaComponent implements OnInit {
     const fechaHoraInicio = `${this.fechaReserva}T${this.horaInicio}:00`;
     const fechaHoraFin = `${this.fechaReserva}T${this.horaFin}:00`;
 
+    // Verificar solapamiento con reservas existentes para la misma cancha
+    this.reservaService.getReservasPorCancha(Number(this.canchaSeleccionada!.id)).subscribe({
+      next: (reservas) => {
+        const newStart = new Date(fechaHoraInicio).getTime();
+        const newEnd = new Date(fechaHoraFin).getTime();
+
+        const overlap = reservas.some(r => {
+          // Considerar tanto CONFIRMADA como PENDIENTE_PAGO como bloqueantes
+          if (!(r.estado === 'CONFIRMADA' || r.estado === 'PENDIENTE_PAGO')) return false;
+          const existingStart = new Date(r.fechaHoraInicio).getTime();
+          const existingEnd = new Date(r.fechaHoraFin).getTime();
+          return newStart < existingEnd && newEnd > existingStart;
+        });
+
+        if (overlap) {
+          this.isLoading = false;
+          this.errorMessage = 'La cancha no está disponible en ese horario (solapamiento detectado).';
+          return;
+        }
+
+        // Si no hay solapamiento, continuar con la creación
+        this.ejecutarCreacionReserva(fechaHoraInicio, fechaHoraFin);
+      },
+      error: (err) => {
+        console.error('Error al verificar reservas existentes:', err);
+        this.isLoading = false;
+        this.errorMessage = 'Error al verificar disponibilidad de la cancha. Intenta nuevamente.';
+      }
+    });
+
+    return;
+
     console.log('=== CREAR RESERVA - DEBUG ===');
     console.log('CanchaId:', this.canchaSeleccionada?.id);
     console.log('Cliente:', this.nombreCliente, this.apellidoCliente);
@@ -758,6 +790,61 @@ export class ReservaComponent implements OnInit {
     this.clienteEncontrado = false;
     this.mensajeBusqueda = '';
     this.setFechaMinima();
+  }
+
+  private ejecutarCreacionReserva(fechaHoraInicio: string, fechaHoraFin: string): void {
+    console.log('=== EJECUTAR CREACION DE RESERVA ===');
+
+    // Determinar el estado según el tipo de pago
+    const esPagoPendiente = this.tipoPago === 'por_pagar';
+    const estadoReserva = esPagoPendiente ? 'PENDIENTE_PAGO' : 'CONFIRMADA';
+
+    const reservaData = {
+      canchaId: this.canchaSeleccionada!.id,
+      nombreCliente: this.nombreCliente,
+      apellidoCliente: this.apellidoCliente,
+      emailCliente: this.emailCliente,
+      telefonoCliente: this.telefonoCliente,
+      rutCliente: this.rutCliente,
+      fechaHoraInicio: fechaHoraInicio,
+      fechaHoraFin: fechaHoraFin,
+      montoTotal: this.precioTotal,
+      tipoPago: this.tipoPago,
+      estado: estadoReserva,
+      pagoCompletado: !esPagoPendiente,
+      checkInRealizado: false
+    };
+
+    console.log('Datos a enviar:', JSON.stringify(reservaData, null, 2));
+
+    this.reservaService.crearReserva(reservaData as any).subscribe({
+      next: (_response) => {
+        console.log('✓✓✓ RESERVA CREADA EXITOSAMENTE ✓✓✓');
+        this.isLoading = false;
+
+        if (this.tipoPago === 'por_pagar') {
+          this.successMessage = `¡Reserva registrada! El cliente debe realizar el pago al llegar (Check-In). Total: $${this.precioTotal.toLocaleString('es-CL')} CLP`;
+        } else {
+          this.successMessage = `¡Reserva creada exitosamente! Total pagado: $${this.precioTotal.toLocaleString('es-CL')} CLP`;
+        }
+
+        this.mostrarFormulario = false;
+
+        setTimeout(() => {
+          this.limpiarFormulario();
+        }, 5000);
+      },
+      error: (error) => {
+        this.isLoading = false;
+        console.error('❌ ERROR AL CREAR RESERVA:', error);
+
+        if (error.status === 0) {
+          this.errorMessage = 'No se puede conectar con el servidor. Verifica que el backend esté corriendo.';
+        } else {
+          this.errorMessage = error.error?.message || 'Error al crear la reserva. Intenta nuevamente.';
+        }
+      }
+    });
   }
 
   nuevaReserva(): void {
