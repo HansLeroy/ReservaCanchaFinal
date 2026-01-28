@@ -26,6 +26,8 @@ export class ReservaComponent implements OnInit {
   fechaReserva: string = '';
   horaInicio: string = '';
   horaFin: string = '';
+  // Duración en minutos (por defecto 60 minutos)
+  duracionMinutos: number = 60;
   precioTotal: number = 0;
   tipoPago: string = '';
 
@@ -46,12 +48,8 @@ export class ReservaComponent implements OnInit {
   horaActual: string = '';
   cargandoDisponibilidad: boolean = false;
 
-  // Horarios disponibles (08:00 a 23:00)
-  horariosDisponibles: string[] = [
-    '08:00', '09:00', '10:00', '11:00', '12:00', '13:00',
-    '14:00', '15:00', '16:00', '17:00', '18:00', '19:00',
-    '20:00', '21:00', '22:00', '23:00'
-  ];
+  // Horarios disponibles (08:00 a 23:00) — generados cada 15 minutos
+  horariosDisponibles: string[] = [];
 
   // Tipos de pago disponibles
   tiposPago: { valor: string, nombre: string, icono: string }[] = [
@@ -72,6 +70,26 @@ export class ReservaComponent implements OnInit {
     this.cargarCanchas();
     this.setFechaMinima();
     this.actualizarHoraActual();
+    this.generarHorariosDisponibles();
+  }
+
+  generarHorariosDisponibles(): void {
+    const inicio = 8; // 08:00
+    const fin = 23;   // 23:00
+    const pasosMinutos = 15;
+    const slots: string[] = [];
+
+    for (let h = inicio; h <= fin; h++) {
+      for (let m = 0; m < 60; m += pasosMinutos) {
+        // Evitar incluir 23:15, 23:30, 23:45 — máximo 23:00
+        if (h === fin && m > 0) continue;
+        const hh = String(h).padStart(2, '0');
+        const mm = String(m).padStart(2, '0');
+        slots.push(`${hh}:${mm}`);
+      }
+    }
+
+    this.horariosDisponibles = slots;
   }
 
   actualizarHoraActual(): void {
@@ -207,16 +225,8 @@ export class ReservaComponent implements OnInit {
       } else {
         this.horaInicio = horaInicio.toTimeString().slice(0, 5);
 
-        // Hora fin: 1 hora después
-        const horaFinDate = new Date(horaInicio.getTime() + 60 * 60 * 1000);
-
-        // Si la hora fin pasa de las 23:00, ajustar a 23:00
-        if (horaFinDate.getHours() >= 23) {
-          this.horaFin = '23:00';
-          console.log('⏰ Hora fin ajustada a 23:00 (límite del día)');
-        } else {
-          this.horaFin = horaFinDate.toTimeString().slice(0, 5);
-        }
+        // Calcular horaFin usando la duración seleccionada (soporta minutos)
+        this.calcularHoraFinDesdeInicioYDuracion();
       }
     }
 
@@ -434,24 +444,46 @@ export class ReservaComponent implements OnInit {
       // Validar y corregir la hora si está fuera de rango
       this.validarHoraInicio();
 
-      // Establecer hora fin automáticamente (1 hora después)
-      const [hora, minuto] = this.horaInicio.split(':');
-      const horaNum = parseInt(hora);
-      let horaFinNum = horaNum + 1;
-
-      // Asegurar que la hora fin no exceda las 23:00
-      if (horaFinNum > 23) {
-        horaFinNum = 23;
-      }
-
-      this.horaFin = `${String(horaFinNum).padStart(2, '0')}:${minuto}`;
+      // Establecer hora fin automáticamente (1 hora después) usando los slots disponibles
+      // Recalcular horaFin usando la duración actual
+      this.calcularHoraFinDesdeInicioYDuracion();
       this.calcularPrecio();
     }
   }
 
+  onDuracionChange(): void {
+    // Al cambiar la duración en minutos, recalcular hora fin y precio
+    this.calcularHoraFinDesdeInicioYDuracion();
+    this.calcularPrecio();
+  }
+
+  calcularHoraFinDesdeInicioYDuracion(): void {
+    if (!this.horaInicio) return;
+    if (!this.horariosDisponibles || this.horariosDisponibles.length === 0) {
+      // Fallback simple: sumar minutos a la hora inicio
+      const [h, m] = this.horaInicio.split(':').map(Number);
+      const fecha = new Date();
+      fecha.setHours(h, m + this.duracionMinutos, 0, 0);
+      const hh = String(fecha.getHours()).padStart(2, '0');
+      const mm = String(fecha.getMinutes()).padStart(2, '0');
+      this.horaFin = `${hh}:${mm}`;
+      return;
+    }
+
+    // Encontrar índice del slot de inicio (o el primer slot >= horaInicio)
+    let idx = this.horariosDisponibles.indexOf(this.horaInicio);
+    if (idx < 0) {
+      idx = this.horariosDisponibles.findIndex(s => s >= this.horaInicio);
+      if (idx < 0) idx = this.horariosDisponibles.length - 1;
+    }
+
+    const pasos = Math.round(this.duracionMinutos / 15);
+    const idxFin = Math.min(this.horariosDisponibles.length - 1, idx + pasos);
+    this.horaFin = this.horariosDisponibles[idxFin];
+  }
+
   validarHoraInicio(): void {
     if (!this.horaInicio) return;
-
     const [hora, minuto] = this.horaInicio.split(':').map(Number);
 
     // Si la hora es menor a 8, forzar a 08:00
@@ -459,24 +491,27 @@ export class ReservaComponent implements OnInit {
       this.horaInicio = '08:00';
       this.errorMessage = 'La hora de inicio debe ser desde las 08:00. Se ajustó automáticamente.';
       setTimeout(() => this.errorMessage = '', 3000);
+      return;
     }
 
-    // Si la hora es mayor o igual a 23, forzar a 22:00 (para permitir reserva hasta las 23:00)
-    if (hora >= 23) {
+    // No permitir iniciar después de las 22:00 (para que la reserva no exceda 23:00)
+    if (hora > 22 || (hora === 22 && minuto > 0)) {
       this.horaInicio = '22:00';
       this.errorMessage = 'La hora de inicio no puede ser después de las 22:00. Se ajustó automáticamente.';
       setTimeout(() => this.errorMessage = '', 3000);
+      return;
     }
 
-    // Redondear minutos a 00
-    if (minuto !== 0) {
-      this.horaInicio = `${String(hora).padStart(2, '0')}:00`;
+    // Si el valor no está dentro de los slots disponibles, intentar normalizar al siguiente slot disponible
+    if (!this.horariosDisponibles.includes(this.horaInicio)) {
+      // Buscar el primer slot mayor o igual
+      const slot = this.horariosDisponibles.find(s => s >= this.horaInicio);
+      if (slot) this.horaInicio = slot;
     }
   }
 
   validarHoraFin(): void {
     if (!this.horaFin) return;
-
     const [hora, minuto] = this.horaFin.split(':').map(Number);
 
     // Si la hora es menor a 8, forzar a 09:00
@@ -484,24 +519,32 @@ export class ReservaComponent implements OnInit {
       this.horaFin = '09:00';
       this.errorMessage = 'La hora de fin debe ser desde las 09:00. Se ajustó automáticamente.';
       setTimeout(() => this.errorMessage = '', 3000);
+      return;
     }
 
-    // Si la hora es mayor a 23, forzar a 23:00
-    if (hora > 23) {
+    // No permitir hora fin después de 23:00
+    if (hora > 23 || (hora === 23 && minuto > 0)) {
       this.horaFin = '23:00';
       this.errorMessage = 'La hora de fin no puede ser después de las 23:00. Se ajustó automáticamente.';
       setTimeout(() => this.errorMessage = '', 3000);
+      return;
     }
 
-    // Redondear minutos a 00
-    if (minuto !== 0) {
-      this.horaFin = `${String(hora).padStart(2, '0')}:00`;
+    // Si el valor no está dentro de los slots disponibles, normalizar al slot anterior disponible
+    if (!this.horariosDisponibles.includes(this.horaFin)) {
+      // Buscar el último slot menor o igual
+      const slotsMenores = this.horariosDisponibles.filter(s => s <= this.horaFin);
+      if (slotsMenores.length > 0) this.horaFin = slotsMenores[slotsMenores.length - 1];
     }
 
-    // Validar que hora fin sea posterior a hora inicio
+    // Validar que hora fin sea posterior a hora inicio; si no, ajustar sumando 1 hora a inicio
     if (this.horaInicio && this.horaFin <= this.horaInicio) {
-      const [horaIni] = this.horaInicio.split(':').map(Number);
-      this.horaFin = `${String(horaIni + 1).padStart(2, '0')}:00`;
+      const [hIni, mIni] = this.horaInicio.split(':').map(Number);
+      const fechaTmp = new Date();
+      fechaTmp.setHours(hIni + 1, mIni, 0, 0);
+      const hh = String(fechaTmp.getHours()).padStart(2, '0');
+      const mm = String(fechaTmp.getMinutes()).padStart(2, '0');
+      this.horaFin = `${hh}:${mm}`;
       this.errorMessage = 'La hora de fin debe ser posterior a la hora de inicio. Se ajustó automáticamente.';
       setTimeout(() => this.errorMessage = '', 3000);
     }
